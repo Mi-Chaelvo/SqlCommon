@@ -1,10 +1,11 @@
 using NUnit.Framework;
-using SqlContext;
+using SqlCommon;
 using System.Diagnostics;
 using System.Linq;
 using System.Data;
 using System.Collections.Generic;
 using System;
+using MySql.Data.MySqlClient;
 
 namespace NUnitTest
 {
@@ -22,7 +23,7 @@ namespace NUnitTest
             try
             {
 
-                var conenction = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
+                var conenction = new MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
                 //conenction.Open();
                 //var cmd = conenction.CreateCommand();
                 //cmd.CommandText = "select age as Id from student";
@@ -31,17 +32,17 @@ namespace NUnitTest
                 //{
                 //    var aa = reader.GetInt32(0);
                 //}
-                for (int i = 0; i < 2; i++)
-                {
-                    var ccc = GetT((s)=>new 
-                    {
-                        s.NickName,
-                        s.IsDelete,
-                    }, conenction, "select name as NickName,is_delete as IsDelete from student").ToArray();
-                }
+                //for (int i = 0; i < 2; i++)
+                //{
+                //    var ccc = GetT((s)=>new 
+                //    {
+                //        s.NickName,
+                //        s.IsDelete,
+                //    }, conenction, "select name as NickName,is_delete as IsDelete from student").ToArray();
+                //}
                 
-                var list = conenction.ExecuteQuery<int>("select age as Id from student").ToArray();
-
+                var list = conenction.ExecuteQuery<Student>("select id as Id,is_delete as IsDelete,name as NickName from student where name like @ids",
+                    new { ids = "%h%" }).ToList();
             }
             catch (System.Exception e)
             {

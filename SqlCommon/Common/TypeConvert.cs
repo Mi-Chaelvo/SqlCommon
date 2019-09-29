@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
 
-namespace SqlContext
+namespace SqlCommon
 {
     public class DbDataInfo
     {
@@ -91,8 +91,13 @@ namespace SqlContext
         }
         public static Func<object, Dictionary<string, object>> Deserializer(object value)
         {
+            Func<object, Dictionary<string, object>> handler = null;
+            if (value is Dictionary<string,object>)
+            {
+                return (object param) => param as Dictionary<string, object>;
+            }
             var type = value.GetType();
-            _deserializers.TryGetValue(type, out Func<object, Dictionary<string, object>> handler);
+            _deserializers.TryGetValue(type, out handler);
             if (handler == null)
             {
                 lock (_deserializers)
@@ -211,11 +216,6 @@ namespace SqlContext
                         continue;
                     }
                     int i = record.GetOrdinal(item.DataName);
-                    Label endIfLabel = generator.DefineLabel();
-                    generator.Emit(OpCodes.Ldarg_0);
-                    generator.Emit(OpCodes.Ldc_I4, i);
-                    generator.Emit(OpCodes.Callvirt, typeof(IDataRecord).GetMethod(nameof(IDataRecord.IsDBNull), new Type[] { typeof(int) }));
-                    generator.Emit(OpCodes.Brtrue, endIfLabel);
                     generator.Emit(OpCodes.Ldloc, local);
                     generator.Emit(OpCodes.Ldarg_0);
                     generator.Emit(OpCodes.Ldc_I4, i);
@@ -224,7 +224,6 @@ namespace SqlContext
                     else
                         generator.Emit(OpCodes.Call, convertMethod);
                     generator.Emit(OpCodes.Callvirt, property.GetSetMethod());
-                    generator.MarkLabel(endIfLabel);
                 }
                 generator.Emit(OpCodes.Ldloc, local);
                 generator.Emit(OpCodes.Ret);

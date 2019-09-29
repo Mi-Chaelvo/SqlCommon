@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SqlContext
+namespace SqlCommon
 {
     public interface ITypeMapper
     {
@@ -211,6 +211,10 @@ namespace SqlContext
         }
         public static string ConvertToString(this IDataRecord dr, int i)
         {
+            if (dr.IsDBNull(i))
+            {
+                return default;
+            }
             var result = dr.GetString(i);
             return result;
         }
@@ -235,6 +239,10 @@ namespace SqlContext
         }
         public static Guid ConvertToGuid(this IDataRecord dr, int i)
         {
+            if (dr.IsDBNull(i))
+            {
+                return default;
+            }
             var result = dr.GetGuid(i);
             return result;
         }
