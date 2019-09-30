@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SqlCommon</name>
+    </assembly>
+    <members>
+        <member name="T:SqlCommon.SqlMapper">
+            <summary>
+            Extended connection
+            </summary>
+        </member>
+        <member name="F:SqlCommon.SqlMapper.TypeMapper">
+            <summary>
+            Type mapper
+            </summary>
+        </member>
+        <member name="P:SqlCommon.SqlMapper.MatchNamesWithUnderscores">
+            <summary>
+            Does name matching ignore underscores
+            </summary>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteQuery``1(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Executes a query, returning the data typed as T.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="connection"></param>
+            <param name="sql"></param>
+            <param name="param"></param>
+            <param name="transaction"></param>
+            <param name="commandTimeout"> Timeout</param>
+            <param name="commandType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteNonQuery(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Execute parameterized SQL
+            </summary>
+            <param name="connection"></param>
+            <param name="sql"></param>
+            <param name="param"></param>
+            <param name="transaction"></param>
+            <param name="commandTimeout"></param>
+            <param name="commandType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Threading.CancellationToken},System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Executes a query, returning the data typed as T
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="connection"></param>
+            <param name="sql"></param>
+            <param name="param"></param>
+            <param name="transaction"></param>
+            <param name="cancelToken"></param>
+            <param name="commandTimeout"> Timeout</param>
+            <param name="commandType"> Type</param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteNonQueryAsync(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Threading.CancellationToken},System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Execute a command asynchronously using Task.
+            </summary>
+            <param name="connection"></param>
+            <param name="sql"></param>
+            <param name="param"></param>
+            <param name="transaction"></param>
+            <param name="cancelToken"></param>
+            <param name="commandTimeout"></param>
+            <param name="commandType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteScalar``1(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Execute parameterized SQL that selects a single value.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="connection"></param>
+            <param name="sql"></param>
+            <param name="param"></param>
+            <param name="transaction"></param>
+            <param name="commandTimeout"></param>
+            <param name="commandType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteScalarAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Threading.CancellationToken},System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Execute parameterized SQL that selects a single value.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="connection"></param>
+            <param name="sql"></param>
+            <param name="param"></param>
+            <param name="transaction"></param>
+            <param name="cancelToken"></param>
+            <param name="commandTimeout"></param>
+            <param name="commandType"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SqlCommon.DbDataInfo">
+            <summary>
+            DbColumn Information
+            </summary>
+        </member>
+        <member name="T:SqlCommon.TypeConvert">
+            <summary>
+            Type Convert
+            </summary>
+        </member>
+        <member name="M:SqlCommon.TypeConvert.GetSerializer``1(SqlCommon.ITypeMapper,System.Data.IDataRecord)">
+            <summary>
+            IDataRecord Converted to T
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="mapper">Type Mapper</param>
+            <param name="record">IDataRecord</param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.TypeConvert.GetSerializer``1(System.Data.IDataRecord)">
+            <summary>
+            IDataRecord Converted to T
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="record"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.TypeConvert.Deserializer(System.Object)">
+            <summary>
+            Object To Dictionary&lt;tstring, object&gt;
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SqlCommon.ITypeMapper">
+            <summary>
+            TypeMapper Interface
+            </summary>
+        </member>
+        <member name="T:SqlCommon.TypeMapper">
+            <summary>
+            Default TypeMapper
+            </summary>
+        </member>
+        <member name="M:SqlCommon.TypeMapper.FindConstructor(System.Type)">
+            <summary>
+            Find parametric constructors.
+            If there is no default constructor, the constructor with the most parameters is returned.
+            </summary>
+            <param name="csharpType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.TypeMapper.FindConstructorParameter(SqlCommon.DbDataInfo[],System.Reflection.ParameterInfo)">
+            <summary>
+            Returns field information based on parameter information
+            </summary>
+            <param name="dataInfos"></param>
+            <param name="parameterInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.TypeMapper.FindMember(System.Reflection.MemberInfo[],SqlCommon.DbDataInfo)">
+            <summary>
+            Returns attribute information based on field information
+            </summary>
+            <param name="properties"></param>
+            <param name="dataInfo"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.TypeMapper.FindConvertMethod(System.Type)">
+            <summary>
+            Return type conversion function.
+            </summary>
+            <param name="csharpType"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

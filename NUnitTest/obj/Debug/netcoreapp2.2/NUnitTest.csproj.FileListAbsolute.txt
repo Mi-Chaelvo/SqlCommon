@@ -6,7 +6,6 @@ C:\SqlCommon\NUnitTest\bin\Debug\netcoreapp2.2\NUnitTest.runtimeconfig.json
 C:\SqlCommon\NUnitTest\bin\Debug\netcoreapp2.2\NUnitTest.runtimeconfig.dev.json
 C:\SqlCommon\NUnitTest\bin\Debug\netcoreapp2.2\NUnitTest.dll
 C:\SqlCommon\NUnitTest\obj\Debug\netcoreapp2.2\NUnitTest.csprojAssemblyReference.cache
-C:\SqlCommon\NUnitTest\obj\Debug\netcoreapp2.2\NUnitTest.csproj.CoreCompileInputs.cache
 C:\SqlCommon\NUnitTest\obj\Debug\netcoreapp2.2\NUnitTest.AssemblyInfoInputs.cache
 C:\SqlCommon\NUnitTest\obj\Debug\netcoreapp2.2\NUnitTest.AssemblyInfo.cs
 C:\SqlCommon\NUnitTest\bin\Debug\netcoreapp2.2\SqlCommon.dll

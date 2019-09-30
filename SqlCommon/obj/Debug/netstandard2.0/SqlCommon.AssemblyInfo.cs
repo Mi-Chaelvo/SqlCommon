@@ -11,8 +11,11 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("SqlCommon")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("chaeyeon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyCopyrightAttribute("chaeyeon")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("A high performance Micro-ORM supporting SQL Server, MySQL, Sqlite, SqlCE, Firebir" +
+    "d etc..")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("SqlCommon")]

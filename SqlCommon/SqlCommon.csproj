@@ -1,8 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.1</LangVersion>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>    
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <Authors>chaeyeon</Authors>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Description>A high performance Micro-ORM supporting SQL Server, MySQL, Sqlite, SqlCE, Firebird etc..</Description>
+    <PackageProjectUrl>https://github.com/1448376744/SqlCommon</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/1448376744/SqlCommon</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>chaeyeon</Copyright>
+    <Company>chaeyeon</Company>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DocumentationFile>.\SqlCommon.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,36 +8,85 @@ using System.Threading.Tasks;
 
 namespace SqlCommon
 {
+    /// <summary>
+    /// TypeMapper Interface
+    /// </summary>
     public interface ITypeMapper
     {
-        MemberInfo FindMember(Type type, MemberInfo[] properties, DbDataInfo dataInfo);
-        MethodInfo FindConvertMethod(Type csharpType, DbDataInfo dataInfo);
-        ConstructorInfo FindConstructor(Type type, DbDataInfo[] dataInfos);
+        MemberInfo FindMember(MemberInfo[] properties, DbDataInfo dataInfo);
+        MethodInfo FindConvertMethod(Type csharpType);
+        DbDataInfo FindConstructorParameter(DbDataInfo[] dataInfos, ParameterInfo parameterInfo);
+        ConstructorInfo FindConstructor(Type csharpType);
     }
+    /// <summary>
+    /// Default TypeMapper
+    /// </summary>
     public class TypeMapper : ITypeMapper
     {
-        public ConstructorInfo FindConstructor(Type type, DbDataInfo[] dataInfos)
+        /// <summary>
+        /// Find parametric constructors.
+        /// If there is no default constructor, the constructor with the most parameters is returned.
+        /// </summary>
+        /// <param name="csharpType"></param>
+        /// <returns></returns>
+        public ConstructorInfo FindConstructor(Type csharpType)
         {
-            var constructor = type.GetConstructor(Type.EmptyTypes);
-            if (constructor==null)
+            var constructor = csharpType.GetConstructor(Type.EmptyTypes);
+            if (constructor == null)
             {
-                var constructors = type.GetConstructors();
-                constructor = constructors.Where(a=>a.GetParameters().Length==constructors.Max(s=>s.GetParameters().Length)).FirstOrDefault();
+                var constructors = csharpType.GetConstructors();
+                constructor = constructors.Where(a => a.GetParameters().Length == constructors.Max(s => s.GetParameters().Length)).FirstOrDefault();
             }
             return constructor;
         }
-        public MemberInfo FindMember(Type type, MemberInfo[] properties, DbDataInfo dataInfo)
+        /// <summary>
+        /// Returns field information based on parameter information
+        /// </summary>
+        /// <param name="dataInfos"></param>
+        /// <param name="parameterInfo"></param>
+        /// <returns></returns>
+        public DbDataInfo FindConstructorParameter(DbDataInfo[] dataInfos, ParameterInfo parameterInfo)
         {
-            foreach (var item in properties)
+            foreach (var item in dataInfos)
             {
-                if (item.Name == dataInfo.DataName)
+                if (item.DataName.Equals(parameterInfo.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return item;
+                }
+                else if (SqlMapper.MatchNamesWithUnderscores && item.DataName.Replace("_", "").Equals(parameterInfo.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }
             }
             return null;
         }
-        public MethodInfo FindConvertMethod(Type csharpType, DbDataInfo dataInfo)
+        /// <summary>
+        /// Returns attribute information based on field information
+        /// </summary>
+        /// <param name="properties"></param>
+        /// <param name="dataInfo"></param>
+        /// <returns></returns>
+        public MemberInfo FindMember(MemberInfo[] properties, DbDataInfo dataInfo)
+        {
+            foreach (var item in properties)
+            {
+                if (item.Name.Equals(dataInfo.DataName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return item;
+                }
+                else if (SqlMapper.MatchNamesWithUnderscores && item.Name.Equals(dataInfo.DataName.Replace("_", ""), StringComparison.OrdinalIgnoreCase))
+                {
+                    return item;
+                }
+            }
+            return null;
+        }
+        /// <summary>
+        /// Return type conversion function.
+        /// </summary>
+        /// <param name="csharpType"></param>
+        /// <returns></returns>
+        public MethodInfo FindConvertMethod(Type csharpType)
         {
             if (csharpType == typeof(byte) || Nullable.GetUnderlyingType(csharpType) == typeof(byte))
             {
