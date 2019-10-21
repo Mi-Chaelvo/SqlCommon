@@ -14,7 +14,7 @@ namespace SqlCommon
     public interface ITypeMapper
     {
         MemberInfo FindMember(MemberInfo[] properties, DbDataInfo dataInfo);
-        MethodInfo FindConvertMethod(Type csharpType);
+        MethodInfo FindConvertMethod(Type csharpType, Type dbType);
         DbDataInfo FindConstructorParameter(DbDataInfo[] dataInfos, ParameterInfo parameterInfo);
         ConstructorInfo FindConstructor(Type csharpType);
     }
@@ -84,68 +84,78 @@ namespace SqlCommon
         /// <summary>
         /// Return type conversion function.
         /// </summary>
-        /// <param name="csharpType"></param>
         /// <returns></returns>
-        public MethodInfo FindConvertMethod(Type csharpType)
+        public MethodInfo FindConvertMethod(Type csharpType, Type dbType)
         {
-            if (csharpType == typeof(byte) || Nullable.GetUnderlyingType(csharpType) == typeof(byte))
+
+            if (GetUnderlyingType(dbType) == typeof(bool) || GetUnderlyingType(csharpType) == typeof(bool))
             {
-                return csharpType == typeof(byte) ? DataConvertMethod.ToByteMethod : DataConvertMethod.ToByteNullableMethod;
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToBooleanMethod : DataConvertMethod.ToBooleanNullableMethod;
             }
-            if (csharpType == typeof(short) || Nullable.GetUnderlyingType(csharpType) == typeof(short))
+            if (GetUnderlyingType(csharpType).IsEnum)
             {
-                return csharpType == typeof(short) ? DataConvertMethod.ToIn16Method : DataConvertMethod.ToIn16NullableMethod;
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToEnumMethod.MakeGenericMethod(csharpType) : DataConvertMethod.ToEnumNullableMethod.MakeGenericMethod(GetUnderlyingType(csharpType));
             }
-            if (csharpType == typeof(int) || Nullable.GetUnderlyingType(csharpType) == typeof(int))
+            if (GetUnderlyingType(dbType) == typeof(char) || GetUnderlyingType(csharpType) == typeof(char))
             {
-                return csharpType == typeof(int) ? DataConvertMethod.ToIn32Method : DataConvertMethod.ToIn32NullableMethod;
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToCharMethod : DataConvertMethod.ToCharNullableMethod;
             }
-            if (csharpType == typeof(long) || Nullable.GetUnderlyingType(csharpType) == typeof(long))
-            {
-                return csharpType == typeof(long) ? DataConvertMethod.ToIn64Method : DataConvertMethod.ToIn64NullableMethod;
-            }
-            if (csharpType == typeof(float) || Nullable.GetUnderlyingType(csharpType) == typeof(float))
-            {
-                return csharpType == typeof(float) ? DataConvertMethod.ToFloatMethod : DataConvertMethod.ToFloatNullableMethod;
-            }
-            if (csharpType == typeof(double) || Nullable.GetUnderlyingType(csharpType) == typeof(double))
-            {
-                return csharpType == typeof(double) ? DataConvertMethod.ToDoubleMethod : DataConvertMethod.ToDoubleNullableMethod;
-            }
-            if (csharpType == typeof(decimal) || Nullable.GetUnderlyingType(csharpType) == typeof(decimal))
-            {
-                return csharpType == typeof(decimal) ? DataConvertMethod.ToDecimalMethod : DataConvertMethod.ToDecimalNullableMethod;
-            }
-            if (csharpType == typeof(bool) || Nullable.GetUnderlyingType(csharpType) == typeof(bool))
-            {
-                return csharpType == typeof(bool) ? DataConvertMethod.ToBooleanMethod : DataConvertMethod.ToBooleanNullableMethod;
-            }
-            if (csharpType == typeof(char) || Nullable.GetUnderlyingType(csharpType) == typeof(char))
-            {
-                return csharpType == typeof(char) ? DataConvertMethod.ToCharMethod : DataConvertMethod.ToCharNullableMethod;
-            }
-            if (csharpType == typeof(string))
+            if (GetUnderlyingType(dbType) == typeof(string) && (csharpType == typeof(string)))
             {
                 return DataConvertMethod.ToStringMethod;
             }
-            if (csharpType == typeof(DateTime) || Nullable.GetUnderlyingType(csharpType) == typeof(DateTime))
+            if (GetUnderlyingType(dbType) == typeof(Guid) || GetUnderlyingType(csharpType) == typeof(Guid))
             {
-                return csharpType == typeof(DateTime) ? DataConvertMethod.ToDateTimeMethod : DataConvertMethod.ToDateTimeNullableMethod;
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToGuidMethod : DataConvertMethod.ToGuidNullableMethod;
             }
-            if (csharpType.IsEnum || Nullable.GetUnderlyingType(csharpType).IsEnum)
+            if (GetUnderlyingType(dbType) == typeof(DateTime) || GetUnderlyingType(csharpType) == typeof(DateTime))
             {
-                return csharpType.IsEnum ? DataConvertMethod.ToEnumMethod.MakeGenericMethod(Nullable.GetUnderlyingType(csharpType)) : DataConvertMethod.ToEnumNullableMethod.MakeGenericMethod(Nullable.GetUnderlyingType(csharpType));
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToDateTimeMethod : DataConvertMethod.ToDateTimeNullableMethod;
             }
-            if (csharpType == typeof(Guid) || Nullable.GetUnderlyingType(csharpType) == typeof(Guid))
+            if (GetUnderlyingType(dbType) == typeof(byte) || GetUnderlyingType(dbType) == typeof(sbyte) || GetUnderlyingType(csharpType) == typeof(byte) || GetUnderlyingType(csharpType) == typeof(sbyte))
             {
-                return csharpType == typeof(Guid) ? DataConvertMethod.ToGuidMethod : DataConvertMethod.ToGuidNullableMethod;
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToByteMethod : DataConvertMethod.ToByteNullableMethod;
             }
-            return null;
+            if (GetUnderlyingType(dbType) == typeof(short) || GetUnderlyingType(dbType) == typeof(ushort) || GetUnderlyingType(csharpType) == typeof(short) || GetUnderlyingType(csharpType) == typeof(ushort))
+            {
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToIn16Method : DataConvertMethod.ToIn16NullableMethod;
+            }
+            if (GetUnderlyingType(dbType) == typeof(int) || GetUnderlyingType(dbType) == typeof(uint) || GetUnderlyingType(csharpType) == typeof(int) || GetUnderlyingType(csharpType) == typeof(uint))
+            {
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToIn32Method : DataConvertMethod.ToIn32NullableMethod;
+            }
+            if (GetUnderlyingType(dbType) == typeof(long) || GetUnderlyingType(dbType) == typeof(long) || GetUnderlyingType(csharpType) == typeof(long) || GetUnderlyingType(csharpType) == typeof(ulong))
+            {
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToIn64Method : DataConvertMethod.ToIn64NullableMethod;
+            }
+            if (GetUnderlyingType(dbType) == typeof(float) || GetUnderlyingType(csharpType) == typeof(float))
+            {
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToFloatMethod : DataConvertMethod.ToFloatNullableMethod;
+            }
+            if (GetUnderlyingType(dbType) == typeof(double) || GetUnderlyingType(csharpType) == typeof(double))
+            {
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToDoubleMethod : DataConvertMethod.ToDoubleNullableMethod;
+            }
+            if (GetUnderlyingType(dbType) == typeof(decimal) || GetUnderlyingType(csharpType) == typeof(decimal))
+            {
+                return !IsNullableType(csharpType) ? DataConvertMethod.ToDecimalMethod : DataConvertMethod.ToDecimalNullableMethod;
+            }
+            return !IsNullableType(csharpType) ? DataConvertMethod.ToObjectMethod.MakeGenericMethod(csharpType) : DataConvertMethod.ToObjectNullableMethod.MakeGenericMethod(Nullable.GetUnderlyingType(GetUnderlyingType(csharpType)));
+        }
+        private Type GetUnderlyingType(Type type)
+        {
+            var underlyingType = Nullable.GetUnderlyingType(type);
+            return underlyingType ?? type;
+        }
+        private bool IsNullableType(Type type)
+        {
+            return Nullable.GetUnderlyingType(type) != null;
         }
     }
     public static class DataConvertMethod
     {
         #region Method Field
+        public static MethodInfo ToObjectMethod = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToObject));
         public static MethodInfo ToByteMethod = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToByte));
         public static MethodInfo ToIn16Method = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToInt16));
         public static MethodInfo ToIn32Method = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToInt32));
@@ -162,6 +172,7 @@ namespace SqlCommon
         #endregion
 
         #region NullableMethod Field
+        public static MethodInfo ToObjectNullableMethod = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertObjectNullable));
         public static MethodInfo ToByteNullableMethod = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToInt16Nullable));
         public static MethodInfo ToIn16NullableMethod = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToInt16Nullable));
         public static MethodInfo ToIn32NullableMethod = typeof(DataConvertMethod).GetMethod(nameof(DataConvertMethod.ConvertToInt32Nullable));
@@ -177,7 +188,16 @@ namespace SqlCommon
         #endregion
 
         #region Define Convert
-        public static byte ConvertToByte(this IDataRecord dr, int i)
+        public static T ConvertToObject<T>(IDataRecord dr, int i)
+        {
+            if (dr.IsDBNull(i))
+            {
+                return default;
+            }
+            var data = dr.GetValue(i);
+            return (T)Convert.ChangeType(data, typeof(T));
+        }
+        public static byte ConvertToByte(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -186,7 +206,7 @@ namespace SqlCommon
             var result = dr.GetByte(i);
             return result;
         }
-        public static short ConvertToInt16(this IDataRecord dr, int i)
+        public static short ConvertToInt16(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -195,25 +215,23 @@ namespace SqlCommon
             var result = dr.GetInt16(i);
             return result;
         }
-        public static int ConvertToInt32(this IDataRecord dr, int i)
+        public static int ConvertToInt32(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
                 return default;
             }
-            var result = dr.GetInt32(i);
-            return result;
+            return dr.GetInt32(i);
         }
-        public static long ConvertToInt64(this IDataRecord dr, int i)
+        public static long ConvertToInt64(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
                 return default;
             }
-            var result = dr.GetInt64(i);
-            return result;
+            return dr.GetInt64(i);
         }
-        public static float ConvertToFloat(this IDataRecord dr, int i)
+        public static float ConvertToFloat(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -222,7 +240,7 @@ namespace SqlCommon
             var result = dr.GetFloat(i);
             return result;
         }
-        public static double ConvertToDouble(this IDataRecord dr, int i)
+        public static double ConvertToDouble(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -231,16 +249,24 @@ namespace SqlCommon
             var result = dr.GetDouble(i);
             return result;
         }
-        public static bool ConvertToBoolean(this IDataRecord dr, int i)
+        public static bool ConvertToBoolean(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
                 return default;
             }
-            var result = dr.GetBoolean(i);
-            return result;
+            if (dr.GetFieldType(i) == typeof(bool))
+            {
+                var result = dr.GetBoolean(i);
+                return result;
+            }
+            else
+            {
+                var result = dr.GetValue(i);
+                return Convert.ToBoolean(result);
+            }
         }
-        public static decimal ConvertToDecimal(this IDataRecord dr, int i)
+        public static decimal ConvertToDecimal(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -258,7 +284,7 @@ namespace SqlCommon
             var result = dr.GetChar(i);
             return result;
         }
-        public static string ConvertToString(this IDataRecord dr, int i)
+        public static string ConvertToString(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -267,7 +293,7 @@ namespace SqlCommon
             var result = dr.GetString(i);
             return result;
         }
-        public static DateTime ConvertToDateTime(this IDataRecord dr, int i)
+        public static DateTime ConvertToDateTime(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -276,17 +302,17 @@ namespace SqlCommon
             var result = dr.GetDateTime(i);
             return result;
         }
-        public static T ConvertToEnum<T>(this IDataRecord dr, int i) where T : struct
+        public static T ConvertToEnum<T>(IDataRecord dr, int i) where T : struct
         {
             if (dr.IsDBNull(i))
             {
                 return default;
             }
-            var value = dr.GetInt32(i);
+            var value = dr.GetValue(i);
             if (Enum.TryParse(value.ToString(), out T result)) return result;
             return default;
         }
-        public static Guid ConvertToGuid(this IDataRecord dr, int i)
+        public static Guid ConvertToGuid(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -298,7 +324,16 @@ namespace SqlCommon
         #endregion
 
         #region Define Nullable Convert
-        public static byte? ConvertToByteNullable(this IDataRecord dr, int i)
+        public static T ConvertObjectNullable<T>(IDataRecord dr, int i)
+        {
+            if (dr.IsDBNull(i))
+            {
+                return default;
+            }
+            var data = dr.GetValue(i);
+            return (T)Convert.ChangeType(data, typeof(T));
+        }
+        public static byte? ConvertToByteNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -307,7 +342,7 @@ namespace SqlCommon
             var result = dr.GetByte(i);
             return result;
         }
-        public static short? ConvertToInt16Nullable(this IDataRecord dr, int i)
+        public static short? ConvertToInt16Nullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -316,7 +351,7 @@ namespace SqlCommon
             var result = dr.GetInt16(i);
             return result;
         }
-        public static int? ConvertToInt32Nullable(this IDataRecord dr, int i)
+        public static int? ConvertToInt32Nullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -325,7 +360,7 @@ namespace SqlCommon
             var result = dr.GetInt32(i);
             return result;
         }
-        public static long? ConvertToInt64Nullable(this IDataRecord dr, int i)
+        public static long? ConvertToInt64Nullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -334,7 +369,7 @@ namespace SqlCommon
             var result = dr.GetInt64(i);
             return result;
         }
-        public static float? ConvertToFloatNullable(this IDataRecord dr, int i)
+        public static float? ConvertToFloatNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -343,7 +378,7 @@ namespace SqlCommon
             var result = dr.GetFloat(i);
             return result;
         }
-        public static double? ConvertToDoubleNullable(this IDataRecord dr, int i)
+        public static double? ConvertToDoubleNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -352,16 +387,24 @@ namespace SqlCommon
             var result = dr.GetDouble(i);
             return result;
         }
-        public static bool? ConvertToBooleanNullable(this IDataRecord dr, int i)
+        public static bool? ConvertToBooleanNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
                 return default;
             }
-            var result = dr.GetBoolean(i);
-            return result;
+            if (dr.GetFieldType(i) == typeof(bool))
+            {
+                var result = dr.GetBoolean(i);
+                return result;
+            }
+            else
+            {
+                var result = dr.GetValue(i);
+                return Convert.ToBoolean(result);
+            }
         }
-        public static decimal? ConvertToDecimalNullable(this IDataRecord dr, int i)
+        public static decimal? ConvertToDecimalNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -370,7 +413,7 @@ namespace SqlCommon
             var result = dr.GetDecimal(i);
             return result;
         }
-        public static char? ConvertToCharNullable(this IDataRecord dr, int i)
+        public static char? ConvertToCharNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -379,7 +422,7 @@ namespace SqlCommon
             var result = dr.GetChar(i);
             return result;
         }
-        public static DateTime? ConvertToDateTimeNullable(this IDataRecord dr, int i)
+        public static DateTime? ConvertToDateTimeNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {
@@ -388,17 +431,17 @@ namespace SqlCommon
             var result = dr.GetDateTime(i);
             return result;
         }
-        public static T? ConvertToEnumNullable<T>(this IDataRecord dr, int i) where T : struct
+        public static T? ConvertToEnumNullable<T>(IDataRecord dr, int i) where T : struct
         {
             if (dr.IsDBNull(i))
             {
                 return default;
             }
-            var value = dr.GetInt32(i);
+            var value = dr.GetValue(i);
             if (Enum.TryParse(value.ToString(), out T result)) return result;
             return default;
         }
-        public static Guid? ConvertToGuidNullable(this IDataRecord dr, int i)
+        public static Guid? ConvertToGuidNullable(IDataRecord dr, int i)
         {
             if (dr.IsDBNull(i))
             {

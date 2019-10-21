@@ -31,8 +31,8 @@ namespace SqlCommon
     /// </summary>
     public class TypeConvert
     {
-        private static Dictionary<SerializerKey, object> _serializers = new Dictionary<SerializerKey, object>();
-        private static Dictionary<Type, Func<object, Dictionary<string, object>>> _deserializers = new Dictionary<Type, Func<object, Dictionary<string, object>>>();
+        private readonly static Dictionary<SerializerKey, object> _serializers = new Dictionary<SerializerKey, object>();
+        private readonly static Dictionary<Type, Func<object, Dictionary<string, object>>> _deserializers = new Dictionary<Type, Func<object, Dictionary<string, object>>>();
         private struct SerializerKey : IEquatable<SerializerKey>
         {
             private string[] Names { get; set; }
@@ -76,10 +76,6 @@ namespace SqlCommon
         /// <summary>
         /// IDataRecord Converted to T
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="mapper">Type Mapper</param>
-        /// <param name="record">IDataRecord</param>
-        /// <returns></returns>
         public static Func<IDataRecord, T> GetSerializer<T>(ITypeMapper mapper, IDataRecord record)
         {
             string[] names = new string[record.FieldCount];
@@ -105,9 +101,6 @@ namespace SqlCommon
         /// <summary>
         /// IDataRecord Converted to T
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="record"></param>
-        /// <returns></returns>
         public static Func<IDataRecord, T> GetSerializer<T>(IDataRecord record)
         {
             return GetSerializer<T>(new TypeMapper(), record);
@@ -115,17 +108,13 @@ namespace SqlCommon
         /// <summary>
         /// Object To Dictionary&lt;tstring, object&gt;
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static Func<object, Dictionary<string, object>> Deserializer(object value)
+        public static Func<object, Dictionary<string, object>> Deserializer(Type type)
         {
-            Func<object, Dictionary<string, object>> handler = null;
-            if (value is Dictionary<string, object>)
+            if (type == typeof(Dictionary<string, object>))
             {
                 return (object param) => param as Dictionary<string, object>;
             }
-            var type = value.GetType();
-            _deserializers.TryGetValue(type, out handler);
+            _deserializers.TryGetValue(type, out Func<object, Dictionary<string, object>> handler);
             if (handler == null)
             {
                 lock (_deserializers)
@@ -141,7 +130,7 @@ namespace SqlCommon
         }
         private static Func<object, Dictionary<string, object>> CreateTypeDeserializeHandler(Type type)
         {
-            var properties = type.GetProperties();
+            var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             var dynamicMethod = new DynamicMethod($"Serializer{type.Name}", typeof(Dictionary<string, object>), new Type[] { typeof(object) }, type, true);
             var generator = dynamicMethod.GetILGenerator();
             LocalBuilder entityLocal = generator.DeclareLocal(typeof(Dictionary<string, object>));
@@ -179,9 +168,10 @@ namespace SqlCommon
                 var typename = record.GetDataTypeName(i);
                 dataInfos[i] = new DbDataInfo(i, typename, datatype, dataname);
             }
-            if (dataInfos.Length == 1)
+            if (dataInfos.Length == 1 && (type.IsValueType || type == typeof(string) || type == typeof(object)))
             {
-                var convertMethod = mapper.FindConvertMethod(type);
+                var dataInfo = dataInfos.First();
+                var convertMethod = mapper.FindConvertMethod(type, dataInfo.DataType);
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, 0);
                 if (convertMethod.IsVirtual)
@@ -209,7 +199,7 @@ namespace SqlCommon
                     {
                         continue;
                     }
-                    var convertMethod = mapper.FindConvertMethod(parameters[i].ParameterType);
+                    var convertMethod = mapper.FindConvertMethod(parameters[i].ParameterType, item.DataType);
                     generator.Emit(OpCodes.Ldarg_0);
                     generator.Emit(OpCodes.Ldc_I4, item.Ordinal);
                     if (convertMethod.IsVirtual)
@@ -240,7 +230,7 @@ namespace SqlCommon
                     {
                         continue;
                     }
-                    var convertMethod = mapper.FindConvertMethod(property.PropertyType);
+                    var convertMethod = mapper.FindConvertMethod(property.PropertyType, item.DataType);
                     if (convertMethod == null)
                     {
                         continue;

@@ -24,27 +24,18 @@ namespace SqlCommon
         /// Does name matching ignore underscores
         /// </summary>
         public static bool MatchNamesWithUnderscores { get; set; }
+
         /// <summary>
         /// Executes a query, returning the data typed as T.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"> Timeout</param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
         public static IEnumerable<T> ExecuteQuery<T>(this IDbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
             using (var cmd = connection.CreateCommand())
             {
                 Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
                 using (var reader = cmd.ExecuteReader())
                 {
-                    var handler = TypeConvert.GetSerializer<T>(reader);
+                    var handler = TypeConvert.GetSerializer<T>(TypeMapper, reader);
                     while (reader.Read())
                     {
                         yield return handler(reader);
@@ -53,48 +44,55 @@ namespace SqlCommon
             }
         }
         /// <summary>
-        /// Execute parameterized SQL
+        /// Executes Multi query, returning the data typed as valueTuple.
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        public static int ExecuteNonQuery(this IDbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        public static (IEnumerable<T1>, IEnumerable<T2>) ExecuteQuery<T1, T2>(this IDbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
             using (var cmd = connection.CreateCommand())
             {
                 Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
-                return cmd.ExecuteNonQuery();
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var count = 0;
+                using (var reader = cmd.ExecuteReader())
+                {
+                    do
+                    {
+                        if (count == 0)
+                        {
+                            var handler = TypeConvert.GetSerializer<T1>(TypeMapper, reader);
+                            while (reader.Read())
+                            {
+                                item1.Add(handler(reader));
+                            }
+                        }
+                        if (count == 1)
+                        {
+                            var handler = TypeConvert.GetSerializer<T2>(TypeMapper, reader);
+                            while (reader.Read())
+                            {
+                                item2.Add(handler(reader));
+                            }
+                        }
+                        count++;
+                    } while (reader.NextResult());
+                    return (item1, item2);
+                }
             }
+
         }
         /// <summary>
         /// Executes a query, returning the data typed as T
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="cancelToken"></param>
-        /// <param name="commandTimeout"> Timeout</param>
-        /// <param name="commandType"> Type</param>
-        /// <returns></returns>
-        public async static Task<IEnumerable<T>> ExecuteQueryAsync<T>(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, CancellationToken? cancelToken = null, int? commandTimeout = null, CommandType? commandType = null)
+        public async static Task<IEnumerable<T>> ExecuteQueryAsync<T>(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            if (connection.State == ConnectionState.Closed)
-                await (cancelToken == null ? connection.OpenAsync() : connection.OpenAsync(cancelToken.Value));
             using (var cmd = connection.CreateCommand())
             {
                 Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
-                using (var reader = await (cancelToken == null ? cmd.ExecuteReaderAsync() : cmd.ExecuteReaderAsync(cancelToken.Value)))
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     var list = new List<T>();
-                    var handler = TypeConvert.GetSerializer<T>(reader);
+                    var handler = TypeConvert.GetSerializer<T>(TypeMapper, reader);
                     while (await reader.ReadAsync())
                     {
                         list.Add(handler(reader));
@@ -104,41 +102,70 @@ namespace SqlCommon
             }
         }
         /// <summary>
-        /// Execute a command asynchronously using Task.
+        ///Executes Multi query, returning the data typed as valueTuple.
         /// </summary>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="cancelToken"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        public async static Task<int> ExecuteNonQueryAsync(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, CancellationToken? cancelToken = null, int? commandTimeout = null, CommandType? commandType = null)
+        public static async Task<(IEnumerable<T1>, IEnumerable<T2>)> ExecuteQueryAsync<T1, T2>(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            if (connection.State == ConnectionState.Closed)
-                await (cancelToken == null ? connection.OpenAsync() : connection.OpenAsync(cancelToken.Value));
             using (var cmd = connection.CreateCommand())
             {
                 Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
-                return await (cancelToken == null ? cmd.ExecuteNonQueryAsync() : cmd.ExecuteNonQueryAsync(cancelToken.Value));
+                var item1 = new List<T1>();
+                var item2 = new List<T2>();
+                var count = 0;
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    do
+                    {
+                        if (count == 0)
+                        {
+                            var handler = TypeConvert.GetSerializer<T1>(TypeMapper, reader);
+                            while (await reader.ReadAsync())
+                            {
+                                item1.Add(handler(reader));
+                            }
+                        }
+                        if (count == 1)
+                        {
+                            var handler = TypeConvert.GetSerializer<T2>(TypeMapper, reader);
+                            while (await reader.ReadAsync())
+                            {
+                                item2.Add(handler(reader));
+                            }
+                        }
+                        count++;
+                    } while (reader.NextResult());
+                    return (item1, item2);
+                }
+            }
+
+        }
+        /// <summary>
+        /// Execute parameterized SQL
+        /// </summary>
+        public static int ExecuteNonQuery(this IDbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        {
+            using (var cmd = connection.CreateCommand())
+            {
+                Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
+                return cmd.ExecuteNonQuery();
+            }
+        }
+        /// <summary>
+        /// Execute a command asynchronously using Task.
+        /// </summary>
+        public async static Task<int> ExecuteNonQueryAsync(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
+        {
+            using (var cmd = connection.CreateCommand())
+            {
+                Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
+                return await cmd.ExecuteNonQueryAsync();
             }
         }
         /// <summary>
         /// Execute parameterized SQL that selects a single value.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
         public static T ExecuteScalar<T>(this IDbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
             using (var cmd = connection.CreateCommand())
             {
                 Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
@@ -153,23 +180,12 @@ namespace SqlCommon
         /// <summary>
         /// Execute parameterized SQL that selects a single value.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="connection"></param>
-        /// <param name="sql"></param>
-        /// <param name="param"></param>
-        /// <param name="transaction"></param>
-        /// <param name="cancelToken"></param>
-        /// <param name="commandTimeout"></param>
-        /// <param name="commandType"></param>
-        /// <returns></returns>
-        public async static Task<T> ExecuteScalarAsync<T>(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, CancellationToken? cancelToken = null, int? commandTimeout = null, CommandType? commandType = null)
+        public async static Task<T> ExecuteScalarAsync<T>(this DbConnection connection, string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null)
         {
-            if (connection.State == ConnectionState.Closed)
-                await (cancelToken == null ? connection.OpenAsync() : connection.OpenAsync(cancelToken.Value));
             using (var cmd = connection.CreateCommand())
             {
                 Initialize(cmd, transaction, sql, param, commandTimeout, commandType);
-                var result = await (cancelToken == null ? cmd.ExecuteScalarAsync() : cmd.ExecuteScalarAsync(cancelToken.Value));
+                var result = await cmd.ExecuteScalarAsync();
                 if (result is DBNull)
                 {
                     return default;
@@ -177,8 +193,12 @@ namespace SqlCommon
                 return (T)Convert.ChangeType(result, typeof(T));
             }
         }
+        /// <summary>
+        /// handler command
+        /// </summary>      
         private static void Initialize(IDbCommand cmd, IDbTransaction transaction, string sql, object param, int? commandTimeout = null, CommandType? commandType = null)
         {
+            var dbParameters = new List<IDbDataParameter>();
             cmd.Transaction = transaction;
             cmd.CommandText = sql;
             if (commandTimeout.HasValue)
@@ -189,16 +209,41 @@ namespace SqlCommon
             {
                 cmd.CommandType = commandType.Value;
             }
-            if (param != null)
+            if (param is IDbDataParameter)
             {
-                var handler = TypeConvert.Deserializer(param);
+                dbParameters.Add(param as IDbDataParameter);
+            }
+            else if (param is IEnumerable<IDbDataParameter> parameters)
+            {
+                dbParameters.AddRange(parameters);
+            }
+            else if (param is Dictionary<string, object> keyValues)
+            {
+                foreach (var item in keyValues)
+                {
+                    var parameter = CreateParameter(cmd, item.Key, item.Value);
+                    dbParameters.Add(parameter);
+                }
+            }
+            else if (param != null)
+            {
+                var handler = TypeConvert.Deserializer(param.GetType());
                 var values = handler(param);
                 foreach (var item in values)
                 {
-                    var pattern = $@"in\s+([\@,\:,\?]?{item.Key})";
-                    if (Regex.IsMatch(cmd.CommandText, pattern))
+                    var parameter = CreateParameter(cmd,item.Key,item.Value);
+                    dbParameters.Add(parameter);
+                }
+            }
+            if (dbParameters.Count > 0)
+            {
+                foreach (IDataParameter item in dbParameters)
+                {
+                    var pattern = $@"in\s+([\@,\:,\?]?{item.ParameterName})";
+                    var options = RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline;
+                    if (cmd.CommandText.IndexOf("in", StringComparison.OrdinalIgnoreCase) != -1 && Regex.IsMatch(cmd.CommandText, pattern, options))
                     {
-                        var name = Regex.Match(cmd.CommandText, pattern, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline).Groups[1].Value;
+                        var name = Regex.Match(cmd.CommandText, pattern, options).Groups[1].Value;
                         var list = new List<object>();
                         if (item.Value is IEnumerable<object> || item.Value is Array)
                         {
@@ -213,9 +258,8 @@ namespace SqlCommon
                             cmd.CommandText = Regex.Replace(cmd.CommandText, name, $"({string.Join(",", list.Select(s => $"{name}{list.IndexOf(s)}"))})");
                             foreach (var iitem in list)
                             {
-                                var parameter = cmd.CreateParameter();
-                                parameter.ParameterName = $"{item.Key}{list.IndexOf(iitem)}";
-                                parameter.Value = iitem;
+                                var key = $"{item.ParameterName}{list.IndexOf(iitem)}";
+                                var parameter = CreateParameter(cmd, key, iitem);
                                 cmd.Parameters.Add(parameter);
                             }
                         }
@@ -226,15 +270,18 @@ namespace SqlCommon
                     }
                     else
                     {
-                        var parameter = cmd.CreateParameter();
-                        parameter.ParameterName = item.Key;
-                        parameter.Value = item.Value;
-                        cmd.Parameters.Add(parameter);
+                        item.Value = item.Value ?? DBNull.Value;
+                        cmd.Parameters.Add(item);
                     }
                 }
             }
         }
-
+        private static IDbDataParameter CreateParameter(IDbCommand command,string name,object value)
+        {
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = name;
+            parameter.Value = value;
+            return parameter;
+        }
     }
-
 }

@@ -23,80 +23,46 @@
             <summary>
             Executes a query, returning the data typed as T.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="connection"></param>
-            <param name="sql"></param>
-            <param name="param"></param>
-            <param name="transaction"></param>
-            <param name="commandTimeout"> Timeout</param>
-            <param name="commandType"></param>
-            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteQuery``2(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Executes Multi query, returning the data typed as valueTuple.
+            </summary>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            Executes a query, returning the data typed as T
+            </summary>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``2(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+             <summary>
+            Executes Multi query, returning the data typed as valueTuple.
+             </summary>
         </member>
         <member name="M:SqlCommon.SqlMapper.ExecuteNonQuery(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute parameterized SQL
             </summary>
-            <param name="connection"></param>
-            <param name="sql"></param>
-            <param name="param"></param>
-            <param name="transaction"></param>
-            <param name="commandTimeout"></param>
-            <param name="commandType"></param>
-            <returns></returns>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Threading.CancellationToken},System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
-            <summary>
-            Executes a query, returning the data typed as T
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="connection"></param>
-            <param name="sql"></param>
-            <param name="param"></param>
-            <param name="transaction"></param>
-            <param name="cancelToken"></param>
-            <param name="commandTimeout"> Timeout</param>
-            <param name="commandType"> Type</param>
-            <returns></returns>
-        </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteNonQueryAsync(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Threading.CancellationToken},System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteNonQueryAsync(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute a command asynchronously using Task.
             </summary>
-            <param name="connection"></param>
-            <param name="sql"></param>
-            <param name="param"></param>
-            <param name="transaction"></param>
-            <param name="cancelToken"></param>
-            <param name="commandTimeout"></param>
-            <param name="commandType"></param>
-            <returns></returns>
         </member>
         <member name="M:SqlCommon.SqlMapper.ExecuteScalar``1(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute parameterized SQL that selects a single value.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="connection"></param>
-            <param name="sql"></param>
-            <param name="param"></param>
-            <param name="transaction"></param>
-            <param name="commandTimeout"></param>
-            <param name="commandType"></param>
-            <returns></returns>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteScalarAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Threading.CancellationToken},System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteScalarAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute parameterized SQL that selects a single value.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="connection"></param>
-            <param name="sql"></param>
-            <param name="param"></param>
-            <param name="transaction"></param>
-            <param name="cancelToken"></param>
-            <param name="commandTimeout"></param>
-            <param name="commandType"></param>
-            <returns></returns>
+        </member>
+        <member name="M:SqlCommon.SqlMapper.Initialize(System.Data.IDbCommand,System.Data.IDbTransaction,System.String,System.Object,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+            <summary>
+            handler command
+            </summary>      
         </member>
         <member name="T:SqlCommon.DbDataInfo">
             <summary>
@@ -112,25 +78,16 @@
             <summary>
             IDataRecord Converted to T
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="mapper">Type Mapper</param>
-            <param name="record">IDataRecord</param>
-            <returns></returns>
         </member>
         <member name="M:SqlCommon.TypeConvert.GetSerializer``1(System.Data.IDataRecord)">
             <summary>
             IDataRecord Converted to T
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="record"></param>
-            <returns></returns>
         </member>
-        <member name="M:SqlCommon.TypeConvert.Deserializer(System.Object)">
+        <member name="M:SqlCommon.TypeConvert.Deserializer(System.Type)">
             <summary>
             Object To Dictionary&lt;tstring, object&gt;
             </summary>
-            <param name="value"></param>
-            <returns></returns>
         </member>
         <member name="T:SqlCommon.ITypeMapper">
             <summary>
@@ -166,12 +123,386 @@
             <param name="dataInfo"></param>
             <returns></returns>
         </member>
-        <member name="M:SqlCommon.TypeMapper.FindConvertMethod(System.Type)">
+        <member name="M:SqlCommon.TypeMapper.FindConvertMethod(System.Type,System.Type)">
             <summary>
             Return type conversion function.
             </summary>
-            <param name="csharpType"></param>
             <returns></returns>
+        </member>
+        <member name="T:SqlCommon.Linq.IQueryable`1">
+            <summary>
+            Queryable
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Set``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},SqlCommon.Linq.ISubQuery,System.Boolean)">
+            <summary>
+            Update column by subquery
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Set``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},``0,System.Boolean)">
+            <summary>
+            Update column by value
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Set``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Update column by expression or function
+            </summary>      
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.GroupBy(System.String,System.Boolean)">
+            <summary>
+            Group by
+            </summary>     
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.GroupBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Group by
+            </summary>     
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Where(System.String,System.Boolean)">
+            <summary>
+            Filter by sql
+            </summary>     
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Where``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Filter by expression
+            </summary>     
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.OrderBy(System.String,System.Boolean)">
+            <summary>
+            Sort by sql
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.OrderBy``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Ascending sort
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.OrderByDescending``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Descending sort
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Skip(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Return "count" record from line "index"
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Take(System.Int32,System.Boolean)">
+            <summary>
+            Return "count" records from line 0
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Page(System.Int32,System.Int32,System.Boolean)">
+            <summary>
+            Return "count" records from page "index"
+            </summary>   
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Page(System.Int32,System.Int32,System.Int64@,System.Boolean)">
+            <summary>
+            Return "count" records from page "index" and return the total
+            </summary>      
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Having(System.String,System.Boolean)">
+            <summary>
+            Filtering after grouping
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Having``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Filtering after grouping
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Filter``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Filter field
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.With(System.String,System.Boolean)">
+            <summary>
+            Read lock
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Single(System.String)">
+            <summary>
+            Returns a single record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SingleAsync(System.String)">
+            <summary>
+            Returns a single record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Single``1(System.String)">
+            <summary>
+            Returns a single record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SingleAsync``1(System.String)">
+            <summary>
+            Returns a single record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Single``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Returns a single record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SingleAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Returns single record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Select(System.String)">
+            <summary>
+            Returns list record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectMany(System.String)">
+            <summary>
+            Returns list record and record total
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectAsync(System.String)">
+            <summary>
+            Returns list record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectManyAsync(System.String)">
+            <summary>
+            Returns list record and record total
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Select``1(System.String)">
+            <summary>
+            Returns list record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectMany``1(System.String)">
+            <summary>
+            Returns list record and record total
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectAsync``1(System.String)">
+            <summary>
+            Returns list record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectManyAsync``1(System.String)">
+            <summary>
+            Returns list record and record total
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Select``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Returns multiple record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectMany``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Returns list record and record total
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Returns multiple record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SelectManyAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+            <summary>
+            Returns list record and record total
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Insert(`0,System.Boolean)">
+            <summary>
+            Insert a record
+            </summary> 
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Insert(System.Linq.Expressions.Expression{System.Func{`0,`0}},System.Boolean)">
+            <summary>
+            Insert a record
+            </summary> 
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertAsync(`0,System.Boolean)">
+            <summary>
+            Insert a record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertAsync(System.Linq.Expressions.Expression{System.Func{`0,`0}},System.Boolean)">
+            <summary>
+            Insert a record
+            </summary> 
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertReturnId(System.Linq.Expressions.Expression{System.Func{`0,`0}},System.Boolean)">
+            <summary>
+            Insert a record,and returns identity
+            </summary> 
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertReturnIdAsync(System.Linq.Expressions.Expression{System.Func{`0,`0}},System.Boolean)">
+            <summary>
+            Insert a record,and returns identity
+            </summary> 
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertReturnId(`0,System.Boolean)">
+            <summary>
+            Insert a record,and returns identity
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertReturnIdAsync(`0,System.Boolean)">
+            <summary>
+            Insert a record,and returns identity
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Insert(System.Collections.Generic.IEnumerable{`0},System.Boolean)">
+            <summary>
+            Insert multiple record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.InsertAsync(System.Collections.Generic.IEnumerable{`0},System.Boolean)">
+            <summary>
+            Insert multiple record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Update(System.Boolean)">
+            <summary>
+            Execute update
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.UpdateAsync(System.Boolean)">
+            <summary>
+            Execute update
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Update(`0,System.Boolean)">
+            <summary>
+            Update a record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.UpdateAsync(`0,System.Boolean)">
+            <summary>
+            Update a record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Update(System.Linq.Expressions.Expression{System.Func{`0,`0}},System.Boolean)">
+            <summary>
+            Update a record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.UpdateAsync(System.Linq.Expressions.Expression{System.Func{`0,`0}},System.Boolean)">
+            <summary>
+            Update a record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Update(System.Collections.Generic.IEnumerable{`0},System.Boolean)">
+            <summary>
+            Update a record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.UpdateAsync(System.Collections.Generic.IEnumerable{`0},System.Boolean)">
+            <summary>
+            Update multiple record
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Delete(System.Boolean)">
+            <summary>
+            Execute delete
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.DeleteAsync(System.Boolean)">
+            <summary>
+            Execute delete
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Delete``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Execute delete
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.DeleteAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Execute delete
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Exists(System.Boolean)">
+            <summary>
+            Existence query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.ExistsAsync(System.Boolean)">
+            <summary>
+            Existence query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Exists``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Existence query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.ExistsAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Existence query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Count(System.String,System.Boolean)">
+            <summary>
+            Count query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.CountAsync(System.String,System.Boolean)">
+            <summary>
+            Count query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Count``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Count query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.CountAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Count query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.Sum``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Summation query
+            </summary>
+        </member>
+        <member name="M:SqlCommon.Linq.IQueryable`1.SumAsync``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Boolean)">
+            <summary>
+            Summation query
+            </summary>
+        </member>
+        <member name="T:SqlCommon.Linq.IQueryable`2">
+            <summary>
+            Queryable
+            </summary>
+        </member>
+        <member name="T:SqlCommon.Linq.IQueryable`3">
+            <summary>
+            Queryable
+            </summary>
+        </member>
+        <member name="T:SqlCommon.Linq.IQueryable`4">
+            <summary>
+            Queryable
+            </summary>
+        </member>
+        <member name="T:SqlCommon.Linq.JoinType">
+            <summary>
+            Join type
+            </summary>
+        </member>
+        <member name="T:SqlCommon.Linq.OrderByExpression">
+            <summary>
+            OrderBy Expression
+            </summary>
+        </member>
+        <member name="T:SqlCommon.Linq.Queryable">
+            <summary>
+            Query common
+            </summary>
         </member>
     </members>
 </doc>

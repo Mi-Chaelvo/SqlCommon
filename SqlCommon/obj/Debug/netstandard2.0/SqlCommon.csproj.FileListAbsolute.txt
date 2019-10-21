@@ -1,9 +1,9 @@
-C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.csprojAssemblyReference.cache
-C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.AssemblyInfoInputs.cache
-C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.AssemblyInfo.cs
 C:\SqlCommon\SqlCommon\bin\Debug\netstandard2.0\SqlCommon.deps.json
 C:\SqlCommon\SqlCommon\bin\Debug\netstandard2.0\SqlCommon.dll
 C:\SqlCommon\SqlCommon\bin\Debug\netstandard2.0\SqlCommon.pdb
+C:\SqlCommon\SqlCommon\bin\Debug\netstandard2.0\SqlCommon.xml
+C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.csprojAssemblyReference.cache
+C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.AssemblyInfoInputs.cache
+C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.AssemblyInfo.cs
 C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.dll
 C:\SqlCommon\SqlCommon\obj\Debug\netstandard2.0\SqlCommon.pdb
-C:\SqlCommon\SqlCommon\bin\Debug\netstandard2.0\SqlCommon.xml
