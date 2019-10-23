@@ -1,18 +1,19 @@
 # SqlCommon
 高性能ORM
 
-## sqlmapper
+## mapper
 
 ``` C#
 var list = connection.ExecuteQuery<Stduent>("select id as Id,nick_name as NickNam from student where id=@Id",new { Id = 1 });
 ```
 
-## sqllinq
+## linq
 
 ``` C#
  [Test]
  public void TestInsert()
  {
+     //创建数据库上下文
      var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
      using (IDbContext db = new DbContext(connection, DbContextType.Mysql))
      {
@@ -70,6 +71,7 @@ var list = connection.ExecuteQuery<Stduent>("select id as Id,nick_name as NickNa
  [Test]
  public void TestUpdate()
  {
+     //创建数据库上下文-代理
      var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
      using (IDbContext db = new DbProxyContext(connection, DbContextType.Mysql))
      {
