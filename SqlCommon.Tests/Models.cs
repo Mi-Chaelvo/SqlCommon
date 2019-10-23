@@ -31,7 +31,7 @@ namespace SqlCommon.Tests
     }
     public class Stuclass
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public int? Sid { get; set; }
         public string Name { get; set; }
     }

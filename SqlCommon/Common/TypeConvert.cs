@@ -47,6 +47,10 @@ namespace SqlCommon
                 {
                     return false;
                 }
+                else if (Names==other.Names)
+                {
+                    return true;
+                }
                 else if (Names.Length != other.Names.Length)
                 {
                     return false;
@@ -83,7 +87,7 @@ namespace SqlCommon
             {
                 names[i] = record.GetName(i);
             }
-            var key = new SerializerKey(typeof(T), names);
+            var key = new SerializerKey(typeof(T), names.Length == 1 ? null : names);
             _serializers.TryGetValue(key, out object handler);
             if (handler == null)
             {

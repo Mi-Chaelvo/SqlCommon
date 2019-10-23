@@ -137,7 +137,6 @@ namespace SqlCommon
                     return (item1, item2);
                 }
             }
-
         }
         /// <summary>
         /// Execute parameterized SQL

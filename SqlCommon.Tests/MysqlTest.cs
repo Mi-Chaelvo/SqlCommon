@@ -18,6 +18,8 @@ namespace SqlCommon.Tests
             {
                 var row = 0;
                 db.Open();//自动提交
+                db.From<Stuclass>().Single(s=>s.Id);
+                db.From<Stuclass>().Single(s => s.Id);
                 //1.更新所有字段（除自增列）
                 row = db.From<Student>().Insert(new Student()
                 {

@@ -102,7 +102,7 @@ namespace SqlCommon.Linq
         }
         public IEnumerable<T> ExecuteQuery<T>(string sql, object param = null, bool buffered = false, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
-            return Connection.ExecuteQuery<T>(sql, param, Transaction, commandTimeout, commandType);
+            return Connection.ExecuteQuery<T>(sql, param, Transaction, commandTimeout, commandType).ToList();
         }
         public Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
