@@ -736,7 +736,7 @@ namespace SqlCommon.Linq
             {
                 return;
             }
-            var handler = TypeConvert.Deserializer(value.GetType());
+            var handler = TypeConvert.GetDeserializer(value.GetType());
             var values = handler(value);
             foreach (var item in values)
             {

@@ -226,7 +226,7 @@ namespace SqlCommon
             }
             else if (param != null)
             {
-                var handler = TypeConvert.Deserializer(param.GetType());
+                var handler = TypeConvert.GetDeserializer(param.GetType());
                 var values = handler(param);
                 foreach (var item in values)
                 {

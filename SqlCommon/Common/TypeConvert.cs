@@ -112,7 +112,7 @@ namespace SqlCommon
         /// <summary>
         /// Object To Dictionary&lt;tstring, object&gt;
         /// </summary>
-        public static Func<object, Dictionary<string, object>> Deserializer(Type type)
+        public static Func<object, Dictionary<string, object>> GetDeserializer(Type type)
         {
             if (type == typeof(Dictionary<string, object>))
             {
