@@ -238,6 +238,7 @@ namespace SqlCommon
             {
                 foreach (IDataParameter item in dbParameters)
                 {
+                    item.Value = item.Value ?? DBNull.Value;
                     var pattern = $@"in\s+([\@,\:,\?]?{item.ParameterName})";
                     var options = RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Multiline;
                     if (cmd.CommandText.IndexOf("in", StringComparison.OrdinalIgnoreCase) != -1 && Regex.IsMatch(cmd.CommandText, pattern, options))
@@ -269,7 +270,6 @@ namespace SqlCommon
                     }
                     else
                     {
-                        item.Value = item.Value ?? DBNull.Value;
                         cmd.Parameters.Add(item);
                     }
                 }

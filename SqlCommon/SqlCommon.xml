@@ -84,7 +84,7 @@
             IDataRecord Converted to T
             </summary>
         </member>
-        <member name="M:SqlCommon.TypeConvert.Deserializer(System.Type)">
+        <member name="M:SqlCommon.TypeConvert.GetDeserializer(System.Type)">
             <summary>
             Object To Dictionary&lt;tstring, object&gt;
             </summary>

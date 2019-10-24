@@ -47,7 +47,7 @@ namespace SqlCommon
                 {
                     return false;
                 }
-                else if (Names==other.Names)
+                else if (Names == other.Names)
                 {
                     return true;
                 }
@@ -123,7 +123,7 @@ namespace SqlCommon
             {
                 lock (_deserializers)
                 {
-                    handler = CreateTypeDeserializeHandler(type) as Func<object, Dictionary<string, object>>;
+                    handler = CreateTypeDeserializerHandler(type) as Func<object, Dictionary<string, object>>;
                     if (!_deserializers.ContainsKey(type))
                     {
                         _deserializers.Add(type, handler);
@@ -132,36 +132,41 @@ namespace SqlCommon
             }
             return handler;
         }
-        private static Func<object, Dictionary<string, object>> CreateTypeDeserializeHandler(Type type)
+        private static Func<object, Dictionary<string, object>> CreateTypeDeserializerHandler(Type type)
         {
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            var dynamicMethod = new DynamicMethod($"Serializer{type.Name}", typeof(Dictionary<string, object>), new Type[] { typeof(object) }, type, true);
+            var methodName = $"{type.Name}Deserializer{Guid.NewGuid().ToString("N")}";
+            var dynamicMethod = new DynamicMethod(methodName, typeof(Dictionary<string, object>), new Type[] { typeof(object) }, type, true);
             var generator = dynamicMethod.GetILGenerator();
-            LocalBuilder entityLocal = generator.DeclareLocal(typeof(Dictionary<string, object>));
+            LocalBuilder entityLocal1 = generator.DeclareLocal(typeof(Dictionary<string, object>));
+            LocalBuilder entityLocal2 = generator.DeclareLocal(type);
             generator.Emit(OpCodes.Newobj, typeof(Dictionary<string, object>).GetConstructor(Type.EmptyTypes));
-            generator.Emit(OpCodes.Stloc, entityLocal);
-
+            generator.Emit(OpCodes.Stloc, entityLocal1);
+            generator.Emit(OpCodes.Ldarg_0);
+            generator.Emit(OpCodes.Castclass, type);
+            generator.Emit(OpCodes.Stloc, entityLocal2);
             foreach (var item in properties)
             {
-                generator.Emit(OpCodes.Ldloc, entityLocal);
+                generator.Emit(OpCodes.Ldloc, entityLocal1);
                 generator.Emit(OpCodes.Ldstr, item.Name);
-                generator.Emit(OpCodes.Ldarg_0);
+                generator.Emit(OpCodes.Ldloc, entityLocal2);
                 generator.Emit(OpCodes.Callvirt, item.GetGetMethod());
                 if (item.PropertyType.IsValueType)
                 {
                     generator.Emit(OpCodes.Box, item.PropertyType);
                 }
-                generator.Emit(OpCodes.Callvirt, typeof(Dictionary<string, object>).GetMethod(nameof(Dictionary<string, object>.Add), new Type[] { typeof(string), typeof(object) }));
+                var addMethod = typeof(Dictionary<string, object>).GetMethod(nameof(Dictionary<string, object>.Add), new Type[] { typeof(string), typeof(object) });
+                generator.Emit(OpCodes.Callvirt, addMethod);
             }
-
-            generator.Emit(OpCodes.Ldloc, entityLocal);
+            generator.Emit(OpCodes.Ldloc, entityLocal1);
             generator.Emit(OpCodes.Ret);
             return dynamicMethod.CreateDelegate(typeof(Func<object, Dictionary<string, object>>)) as Func<object, Dictionary<string, object>>;
         }
         private static Func<IDataRecord, T> CreateTypeSerializerHandler<T>(ITypeMapper mapper, IDataRecord record)
         {
             var type = typeof(T);
-            var dynamicMethod = new DynamicMethod($"{type.Name}Deserializer{Guid.NewGuid().ToString("N")}", type, new Type[] { typeof(IDataRecord) }, type, true);
+            var methodName = $"{type.Name}Serializer{Guid.NewGuid().ToString("N")}";
+            var dynamicMethod = new DynamicMethod(methodName, type, new Type[] { typeof(IDataRecord) }, type, true);
             var generator = dynamicMethod.GetILGenerator();
             LocalBuilder local = generator.DeclareLocal(type);
             var dataInfos = new DbDataInfo[record.FieldCount];

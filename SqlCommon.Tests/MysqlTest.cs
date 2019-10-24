@@ -14,12 +14,10 @@ namespace SqlCommon.Tests
         public void TestInsert()
         {
             var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
-            using (IDbContext db = new DbContext(connection, DbContextType.Mysql))
+            using (IDbContext db = new DbProxyContext(connection, DbContextType.Mysql))
             {
                 var row = 0;
                 db.Open();//自动提交
-                db.From<Stuclass>().Single(s=>s.Id);
-                db.From<Stuclass>().Single(s => s.Id);
                 //1.更新所有字段（除自增列）
                 row = db.From<Student>().Insert(new Student()
                 {
@@ -270,15 +268,15 @@ namespace SqlCommon.Tests
                        Class = b.Name,
                        StuNames = SqlFun.GROUP_CONCAT(a.Name)
                    });
-               var list3 = db.From<Student, Stuclass, Stuid>()
-                    .Join((Student a, Stuclass b) => a.Id == b.Sid)
-                    .Join((Student a, Stuid b) => a.Id == b.Sid)
-                    .Select((a, b, c) => new
-                    {
-                        a.Id,
-                        b.Name,
-                        c.IdNum
-                    }).ToList();
+                var list3 = db.From<Student, Stuclass, Stuid>()
+                     .Join((Student a, Stuclass b) => a.Id == b.Sid)
+                     .Join((Student a, Stuid b) => a.Id == b.Sid)
+                     .Select((a, b, c) => new
+                     {
+                         a.Id,
+                         b.Name,
+                         c.IdNum
+                     }).ToList();
             }
         }
     }

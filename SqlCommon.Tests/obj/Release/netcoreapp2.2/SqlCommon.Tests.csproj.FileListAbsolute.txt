@@ -1,0 +1,16 @@
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\NUnit3.TestAdapter.dll
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\NUnit3.TestAdapter.pdb
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\nunit.engine.netstandard.dll
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.Tests.deps.json
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.Tests.runtimeconfig.json
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.Tests.runtimeconfig.dev.json
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.Tests.dll
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.Tests.pdb
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.dll
+C:\SqlCommon\SqlCommon.Tests\bin\Release\netcoreapp2.2\SqlCommon.pdb
+C:\SqlCommon\SqlCommon.Tests\obj\Release\netcoreapp2.2\SqlCommon.Tests.csprojAssemblyReference.cache
+C:\SqlCommon\SqlCommon.Tests\obj\Release\netcoreapp2.2\SqlCommon.Tests.AssemblyInfoInputs.cache
+C:\SqlCommon\SqlCommon.Tests\obj\Release\netcoreapp2.2\SqlCommon.Tests.AssemblyInfo.cs
+C:\SqlCommon\SqlCommon.Tests\obj\Release\netcoreapp2.2\SqlCommon.Tests.csproj.CopyComplete
+C:\SqlCommon\SqlCommon.Tests\obj\Release\netcoreapp2.2\SqlCommon.Tests.dll
+C:\SqlCommon\SqlCommon.Tests\obj\Release\netcoreapp2.2\SqlCommon.Tests.pdb
