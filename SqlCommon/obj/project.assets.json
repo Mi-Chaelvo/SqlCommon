@@ -379,7 +379,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "2.0.0-beta",
+    "version": "2.0.0-beta1",
     "restore": {
       "projectUniqueName": "C:\\SqlCommon\\SqlCommon\\SqlCommon.csproj",
       "projectName": "SqlCommon",

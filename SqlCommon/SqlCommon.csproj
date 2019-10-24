@@ -14,7 +14,7 @@
     <Copyright>chaeyeon</Copyright>
     <Company>chaeyeon</Company>
     <PackageId>SqlCommon</PackageId>
-    <Version>2.0.0-beta</Version>
+    <Version>2.0.0-beta1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
