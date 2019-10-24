@@ -4,7 +4,13 @@
 ## mapper
 
 ``` C#
+//查询
 var list = connection.ExecuteQuery<Stduent>("select id as Id,nick_name as NickNam from student where id=@Id",new { Id = 1 });
+//修改
+var row = connection.ExecuteQuery<Stduent>("insert into student(name,age) values (@Name,@Age)",new { Name = "admin",Age=10 });
+//多结果集
+var （list1,list2） = connection.ExecuteQuery<Stduent>("select * from student;select count(1) from student;");
+var count = list2.First();
 ```
 
 ## linq
