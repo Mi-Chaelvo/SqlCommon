@@ -6,14 +6,18 @@
 ``` C#
 //查询
 var list = connection.ExecuteQuery<Stduent>("select id as Id,nick_name as NickNam from student where id=@Id",new { Id = 1 });
+
 //修改
 var row = connection.ExecuteQuery<Stduent>("insert into student(name,age) values (@Name,@Age)",new { Name = "admin",Age=10 });
+
 //多结果集
 var （list1,list2） = connection.ExecuteQuery<Stduent>("select * from student;select count(1) from student;");
 var count = list2.First();
 ```
 
-## linq
+## expression
+
+### insert
 
 ``` C#
  [Test]
@@ -73,8 +77,12 @@ var count = list2.First();
          Debug.WriteLine(string.Join("\r\n", db.Loggers.Select(s => s.Text)));
      }
  }
+ 
+```
+### update
 
- [Test]
+``` C#
+[Test]
  public void TestUpdate()
  {
      //创建数据库上下文-代理
@@ -137,10 +145,13 @@ var count = list2.First();
              .Where(a => a.Id == 27)
              .Update();
          Debug.WriteLine(string.Join("\r\n", db.Loggers.Select(s => s.Text)));
-
      }
  }
+ 
+```
+### delete
 
+``` C#
  [Test]
  public void TestDelete()
  {
@@ -152,7 +163,11 @@ var count = list2.First();
          var row2 = db.From<Student>().Where(a => Operator.In(a.Id, new int[] { 1, 2, 3 })).Delete();
      }
  }
+```
 
+### Single
+
+``` C#
  [Test]
  public void TestSingle()
  {
@@ -180,8 +195,11 @@ var count = list2.First();
          });
      }
  }
+```
+### select
 
- [Test]
+``` C#
+[Test]
  public void TestSelect()
  {
      var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
@@ -198,8 +216,12 @@ var count = list2.First();
          var list7 = db.From<Student>().Select(s => new Student { IsDelete = s.IsDelete, Id = s.Id, Name = s.Name }).ToList();
      }
  }
+```
 
- [Test]
+### groupby
+
+``` C#
+[Test]
  public void TestGroup()
  {
      var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
@@ -219,8 +241,11 @@ var count = list2.First();
              }).ToList();
      }
  }
+```
+### page
 
- [Test]
+``` C#
+[Test]
  public void TestPage()
  {
      var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
@@ -242,8 +267,12 @@ var count = list2.First();
          var (glist2, gtotal2) = db.From<Student>().GroupBy(a => a.Name).Page(2, 2).SelectMany(s => new { s.Name, Count = SqlFun.COUNT(1L) });
      }
  }
+```
 
- [Test]
+### join
+
+``` C#
+[Test]
  public void TestJoin()
  {
      var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
@@ -289,5 +318,5 @@ var count = list2.First();
              }).ToList();
      }
  }
-
 ```
+
