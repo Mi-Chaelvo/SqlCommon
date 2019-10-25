@@ -258,7 +258,6 @@ namespace SqlCommon
                 generator.Emit(OpCodes.Ret);
                 return dynamicMethod.CreateDelegate(typeof(Func<IDataRecord, T>)) as Func<IDataRecord, T>;
             }
-
         }
     }
 }

@@ -432,7 +432,6 @@ namespace SqlCommon.Linq
         public int? RowIndex = null;
         public int? RowCount = null;
         public int? Timeout = null;
-        public bool Buffered = false;
         public string ViewName = string.Empty;
         public IDbContext DbContext { get; set; }
         public TableInfo TableInfo { get; set; }
@@ -1143,7 +1142,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<T>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<T>(sql, Values, Timeout);
             }
             return new List<T>();
         }
@@ -1153,7 +1152,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -1163,7 +1162,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -1213,7 +1212,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<T, long>(sql, Values, false, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<T, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<T>(), 0);
@@ -1239,7 +1238,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, false, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -1265,7 +1264,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, false, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -1306,7 +1305,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<T>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<T>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -1317,7 +1316,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -1328,7 +1327,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -1543,7 +1542,7 @@ namespace SqlCommon.Linq
             }
             return this;
         }
-        public SqlQuery(IDbContext dbContext = null, string viewName = null, bool buffered = false, int? timeout = null)
+        public SqlQuery(IDbContext dbContext = null, string viewName = null, int? timeout = null)
         {
             TableInfo = TableInfoCache.GetTable(typeof(T));
             DbContext = dbContext;
@@ -1551,7 +1550,6 @@ namespace SqlCommon.Linq
             Prefix = "@";
             SingleTable = true;
             Timeout = timeout;
-            Buffered = buffered;
         }
         public string BuildInsert(bool returnId = false)
         {
@@ -1703,7 +1701,6 @@ namespace SqlCommon.Linq
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName;
-            Buffered = false;
         }
         public List<string> TableNames = new List<string>();
         public long Count(string expression = null, bool condition = true)
@@ -1861,7 +1858,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -1871,7 +1868,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -1903,7 +1900,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Buffered, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -1916,7 +1913,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Buffered, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -1954,7 +1951,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -1965,7 +1962,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -2031,7 +2028,6 @@ namespace SqlCommon.Linq
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName ?? string.Empty;
-            Buffered = false;
         }
         public List<string> TableNames = new List<string>();
         public long Count(string expression = null, bool condition = true)
@@ -2196,7 +2192,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -2206,7 +2202,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -2238,7 +2234,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Buffered, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -2251,7 +2247,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Buffered, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -2289,7 +2285,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -2300,7 +2296,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -2366,7 +2362,6 @@ namespace SqlCommon.Linq
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName;
-            Buffered = false;
         }
         public List<string> TableNames = new List<string>();
         public long Count(string expression = null, bool condition = true)
@@ -2531,7 +2526,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -2541,7 +2536,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout);
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout);
             }
             return new List<TResult>();
         }
@@ -2573,7 +2568,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Buffered, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -2586,7 +2581,7 @@ namespace SqlCommon.Linq
                 var countSql = BuildCount();
                 var querySql = BuildSelect();
                 var sql = string.Format("{0};{1}", querySql, countSql);
-                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Buffered, Timeout);
+                var (item1, item2) = DbContext.ExecuteQuery<TResult, long>(sql, Values, Timeout);
                 return (item1, item2.FirstOrDefault());
             }
             return (new List<TResult>(), 0);
@@ -2624,7 +2619,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }
@@ -2635,7 +2630,7 @@ namespace SqlCommon.Linq
             if (DbContext != null)
             {
                 var sql = BuildSelect();
-                return DbContext.ExecuteQuery<TResult>(sql, Values, Buffered, Timeout).FirstOrDefault();
+                return DbContext.ExecuteQuery<TResult>(sql, Values, Timeout).FirstOrDefault();
             }
             return default;
         }

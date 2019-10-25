@@ -27,8 +27,6 @@ namespace SqlCommon
         /// Find parametric constructors.
         /// If there is no default constructor, the constructor with the most parameters is returned.
         /// </summary>
-        /// <param name="csharpType"></param>
-        /// <returns></returns>
         public ConstructorInfo FindConstructor(Type csharpType)
         {
             var constructor = csharpType.GetConstructor(Type.EmptyTypes);
@@ -42,9 +40,6 @@ namespace SqlCommon
         /// <summary>
         /// Returns field information based on parameter information
         /// </summary>
-        /// <param name="dataInfos"></param>
-        /// <param name="parameterInfo"></param>
-        /// <returns></returns>
         public DbDataInfo FindConstructorParameter(DbDataInfo[] dataInfos, ParameterInfo parameterInfo)
         {
             foreach (var item in dataInfos)
@@ -63,9 +58,6 @@ namespace SqlCommon
         /// <summary>
         /// Returns attribute information based on field information
         /// </summary>
-        /// <param name="properties"></param>
-        /// <param name="dataInfo"></param>
-        /// <returns></returns>
         public MemberInfo FindMember(MemberInfo[] properties, DbDataInfo dataInfo)
         {
             foreach (var item in properties)
@@ -84,10 +76,8 @@ namespace SqlCommon
         /// <summary>
         /// Return type conversion function.
         /// </summary>
-        /// <returns></returns>
         public MethodInfo FindConvertMethod(Type csharpType, Type dbType)
         {
-
             if (GetUnderlyingType(dbType) == typeof(bool) || GetUnderlyingType(csharpType) == typeof(bool))
             {
                 return !IsNullableType(csharpType) ? DataConvertMethod.ToBooleanMethod : DataConvertMethod.ToBooleanNullableMethod;
