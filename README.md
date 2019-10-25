@@ -2,7 +2,8 @@
 
 ## 关于作者
 
-QQ-Email:1448376744@qq.com
+QQ-Email： 1448376744@qq.com
+
 QQ群：642555086
 
 ## mapper
