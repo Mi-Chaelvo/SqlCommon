@@ -6,6 +6,7 @@ QQ-Email： 1448376744@qq.com
 
 QQ群：642555086
 
+文档：https://github.com/1448376744/SqlCommon/wiki
 ## mapper
 
 ``` C#
