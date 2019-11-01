@@ -1,6 +1,16 @@
 # SqlCommon
-高性能ORM
 
+## 关于作者
+
+QQ-Email： 1448376744@qq.com
+
+QQ群：642555086
+
+文档：https://github.com/1448376744/SqlCommon/wiki
+
+## 说明
+sqlcommon 是从dapper.common移植过来的，内置一个微型的类型映射器，你可以通过实现IDbContext接口来替换成其它orm,Form函数扩展到了所有IDbContext的
+实现类上。
 ## mapper
 
 ``` C#
