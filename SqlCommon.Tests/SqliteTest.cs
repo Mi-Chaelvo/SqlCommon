@@ -64,7 +64,6 @@ namespace SqlCommon.Tests
                 students.Add(new Student() { Name = "tom", Balance = 50 });
                 students.Add(new Student() { Name = "bob", Balance = 100 });
                 row = db.From<Student>().Insert(students);
-                Debug.WriteLine(string.Join("\r\n", db.Loggers.Select(s => s.Text)));
             }
         }
 
@@ -131,7 +130,6 @@ namespace SqlCommon.Tests
                     .Set(a => a.Name, a => SqlFun.Replace(a.Name, "b", charat))//true
                     .Where(a => a.Id == 27)
                     .Update();
-                Debug.WriteLine(string.Join("\r\n", db.Loggers.Select(s => s.Text)));
             }
         }
 
@@ -306,9 +304,9 @@ namespace SqlCommon.Tests
     public class SqliteConcat<T> : IQuery
     {
         private Expression Expression = null;
-        public string Build(Dictionary<string, object> values, string prefix)
+        public string Build(Dictionary<string, object> values, DbContextType dbContextType)
         {
-            var list = ExpressionUtil.BuildNewOrInitExpression(Expression,values,prefix,true);
+            var list = ExpressionUtil.BuildNewOrInitExpression(Expression,values, dbContextType, true);
             return string.Join("||", list.Select(s => s.Value));
         }
         public void Concat<TResult>(Expression<Func<T,TResult>> expression)

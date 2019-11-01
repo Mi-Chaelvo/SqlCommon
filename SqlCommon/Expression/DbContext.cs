@@ -19,6 +19,7 @@ namespace SqlCommon.Linq
     {
         Mysql,
         SqlServer,
+        Postgresql,
         Oracle,
         Sqlite,
     }
@@ -31,7 +32,6 @@ namespace SqlCommon.Linq
     {
         DbContextState DbContextState { get; }
         DbContextType DbContextType { get; }
-        List<DbContextLogger> Loggers { get; }
         int ExecuteNonQuery(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text);
         Task<int> ExecuteNonQueryAsync(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text);
         T ExecuteScalar<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text);
@@ -54,13 +54,13 @@ namespace SqlCommon.Linq
         {
             Connection = connection;
             DbContextType = contextType;
+            DbContextState = DbContextState.Closed;
         }
-        public DbContextState DbContextState { get; private set; } = DbContextState.Closed;
+        public DbContextState DbContextState { get; private set; }
         public DbContextType DbContextType { get; private set; }
-        public List<DbContextLogger> Loggers { get; private set; } = new List<DbContextLogger>();
         public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
-        public void Close()
+        public virtual void Close()
         {
             try
             {
@@ -75,50 +75,49 @@ namespace SqlCommon.Linq
                 DbContextState = DbContextState.Closed;
             }
         }
-        public void Commit()
+        public virtual void Commit()
         {
-            DbContextState = DbContextState.Commit;
             Transaction?.Commit();
+            DbContextState = DbContextState.Commit;
         }
-        public void Dispose()
+        public virtual void Dispose()
         {
             Close();
         }
-        public (IEnumerable<T1>, IEnumerable<T2>) ExecuteQuery<T1, T2>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
+        public virtual (IEnumerable<T1>, IEnumerable<T2>) ExecuteQuery<T1, T2>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
             return Connection.ExecuteQuery<T1, T2>(sql, param, Transaction, commandTimeout, commandType);
         }
-        public Task<(IEnumerable<T1>, IEnumerable<T2>)> ExecuteQueryAsync<T1, T2>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
+        public virtual Task<(IEnumerable<T1>, IEnumerable<T2>)> ExecuteQueryAsync<T1, T2>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
             return (Connection as DbConnection).ExecuteQueryAsync<T1, T2>(sql, param, Transaction, commandTimeout, commandType);
         }
-        public Task<int> ExecuteNonQueryAsync(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
+        public virtual Task<int> ExecuteNonQueryAsync(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
             return (Connection as DbConnection).ExecuteNonQueryAsync(sql, param, Transaction, commandTimeout, commandType);
         }
-        public int ExecuteNonQuery(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
+        public virtual int ExecuteNonQuery(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
             return Connection.ExecuteNonQuery(sql, param, Transaction, commandTimeout, commandType);
         }
-        public IEnumerable<T> ExecuteQuery<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
+        public virtual IEnumerable<T> ExecuteQuery<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
             return Connection.ExecuteQuery<T>(sql, param, Transaction, commandTimeout, commandType).ToList();
         }
-        public Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
+        public virtual Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
             return (Connection as DbConnection).ExecuteQueryAsync<T>(sql, param, Transaction, commandTimeout, commandType);
         }
-        public T ExecuteScalar<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
+        public virtual T ExecuteScalar<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
             return Connection.ExecuteScalar<T>(sql, param, Transaction, commandTimeout, commandType);
         }
-        public Task<T> ExecuteScalarAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
+        public virtual Task<T> ExecuteScalarAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
             return (Connection as DbConnection).ExecuteScalarAsync<T>(sql, param, Transaction, commandTimeout, commandType);
         }
-        public void Open(bool beginTransaction = false, IsolationLevel? isolationLevel = IsolationLevel.ReadUncommitted)
+        public virtual void Open(bool beginTransaction = false, IsolationLevel? isolationLevel = IsolationLevel.ReadUncommitted)
         {
-
             Connection.Open();
             if (beginTransaction)
             {
@@ -126,7 +125,7 @@ namespace SqlCommon.Linq
             }
             DbContextState = DbContextState.Open;
         }
-        public async Task OpenAsync(bool beginTransaction = false, IsolationLevel? isolationLevel = null)
+        public virtual async Task OpenAsync(bool beginTransaction = false, IsolationLevel? isolationLevel = null)
         {
             var dbConnection = Connection as DbConnection;
             await dbConnection.OpenAsync();
@@ -136,7 +135,7 @@ namespace SqlCommon.Linq
             }
             DbContextState = DbContextState.Open;
         }
-        public void Rollback()
+        public virtual void Rollback()
         {
             Transaction?.Rollback();
             DbContextState = DbContextState.Rollback;
@@ -147,7 +146,7 @@ namespace SqlCommon.Linq
         private IDbContext DbContext { get; set; }
         public DbContextState DbContextState => DbContext.DbContextState;
         public DbContextType DbContextType => DbContext.DbContextType;
-        public List<DbContextLogger> Loggers => DbContext.Loggers;
+        public List<DbContextLogger> Loggers { get; private set; } = new List<DbContextLogger>();
         public IDbConnection Connection => DbContext.Connection;
         public IDbTransaction Transaction => DbContext.Transaction;
         public DbProxyContext(IDbConnection connection, DbContextType contextType)

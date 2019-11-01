@@ -7,29 +7,26 @@ using System.Text;
 
 namespace SqlCommon.Linq
 {
-    public class ExpressionUtil : ExpressionVisitor
+    public class SqlExpression : ExpressionVisitor
     {
         #region propertys
-        private readonly StringBuilder SqlBuild = new StringBuilder();
-        private Dictionary<string, object> Values { get; set; }
+        public readonly StringBuilder SqlBuild = new StringBuilder();
+        public Dictionary<string, object> Values { get; set; }
         private string ValueName = "Name";
-        private string Prefix { get; set; }
+        public string Prefix { get; set; }
         private string OperatorMethod { get; set; }
         private string Operator { get; set; }
-        private bool SingleTable { get; set; }
+        public bool SingleTable { get; set; }
+        public DbContextType DbContextType { get; set; }
         #endregion
 
         #region override
         protected override Expression VisitMember(MemberExpression node)
         {
             if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
-            {
                 SetName(node);
-            }
             else
-            {
                 SetValue(node);
-            }
             return node;
         }
         protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -85,9 +82,7 @@ namespace SqlCommon.Linq
                         {
                             Visit(newArrayExpression.Expressions[j]);
                             if (j + 1 != newArrayExpression.Expressions.Count)
-                            {
                                 SqlBuild.Append(",");
-                            }
                         }
                     }
                     else
@@ -95,9 +90,7 @@ namespace SqlCommon.Linq
                         Visit(node.Arguments[i]);
                     }
                     if (i + 1 != node.Arguments.Count)
-                    {
                         SqlBuild.Append(",");
-                    }
                 }
                 SqlBuild.Append(")");
             }
@@ -150,7 +143,8 @@ namespace SqlCommon.Linq
         }
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Value == null)
+            var value = ExpressionUtil.GetDbValue(node.Value, DbContextType);
+            if (value == null)
             {
                 SqlBuild.AppendFormat("NULL");
             }
@@ -158,61 +152,43 @@ namespace SqlCommon.Linq
             {
                 if (OperatorMethod == nameof(Linq.Operator.EndsWith) || OperatorMethod == nameof(Linq.Operator.NotEndsWith))
                 {
-                    SqlBuild.AppendFormat("'%{0}'", node.Value);
+                    SqlBuild.AppendFormat("'%{0}'", value);
                 }
                 else if (OperatorMethod == nameof(Linq.Operator.StartsWith) || OperatorMethod == nameof(Linq.Operator.NotStartsWith))
                 {
-                    SqlBuild.AppendFormat("'{0}%'", node.Value);
+                    SqlBuild.AppendFormat("'{0}%'", value);
                 }
                 else
                 {
-                    SqlBuild.AppendFormat("'%{0}%'", node.Value);
+                    SqlBuild.AppendFormat("'%{0}%'", value);
                 }
             }
-            else if (node.Value is string)
+            else if (value is string)
             {
-                SqlBuild.AppendFormat("'{0}'", node.Value);
-            }
-            else if (node.Value is Enum)
-            {
-                SqlBuild.AppendFormat("{0}", Convert.ToInt32(node.Value));
-            }
-            else if (node.Value is bool)
-            {
-                SqlBuild.AppendFormat("{0}", Convert.ToBoolean(node.Value) ? 1 : 0);
+                SqlBuild.AppendFormat("'{0}'", value);
             }
             else
             {
-                SqlBuild.AppendFormat("{0}", node.Value);
+                SqlBuild.AppendFormat("{0}", value);
             }
             return node;
         }
         #endregion
 
         #region private
-        private static string GetColumnName(Type type, string name, bool singleTable)
-        {
-            var columnName = TableInfoCache.GetColumn(type, f => f.CSharpName == name)?.ColumnName ?? name;
-            if (!singleTable)
-            {
-                var tableName = TableInfoCache.GetTable(type).TableName;
-                columnName = string.Format("{0}.{1}", tableName, columnName);
-            }
-            return columnName;
-        }       
         private void SetName(MemberExpression expression)
         {
             var memberName = expression.Member.Name;
-            var columnName = GetColumnName(expression.Expression.Type, memberName, SingleTable);
+            var columnName = ExpressionUtil.GetColumnName(expression.Expression.Type, memberName, SingleTable);
             SqlBuild.Append(columnName);
             ValueName = memberName;
         }
         private void SetValue(Expression expression)
         {
-            var value = GetValue(expression);
+            var value = ExpressionUtil.GetExpressionValue(expression);
             if (value is IQuery sqlBuilder)
             {
-                SqlBuild.Append(sqlBuilder.Build(Values, Prefix));
+                SqlBuild.Append(sqlBuilder.Build(Values, DbContextType));
             }
             else
             {
@@ -231,34 +207,40 @@ namespace SqlCommon.Linq
                         value = string.Format("%{0}%", value);
                     }
                 }
-                else if (value is Enum)
-                {
-                    value = Convert.ToInt32(value);
-                }
-                else if (value is bool)
-                {
-                    value = Convert.ToBoolean(value) ? 1 : 0;
-                }
+                value = ExpressionUtil.GetDbValue(value, DbContextType);
                 var key = string.Format("{0}{1}{2}", Prefix, ValueName, Values.Count);
                 Values.Add(key, value);
                 SqlBuild.Append(key);
             }
         }
         #endregion
-
-        #region public
-        public static string BuildExpression(Expression expression, Dictionary<string, object> param, string prefix = "@", bool singleTable = true)
+    }
+    public class ExpressionUtil : ExpressionVisitor
+    {
+        public static string GetColumnName(Type type, string csharpName, bool singleTable)
         {
-            var visitor = new ExpressionUtil
+            var columnName = TableInfoCache.GetColumn(type, f => f.CSharpName == csharpName)?.ColumnName ?? csharpName;
+            if (!singleTable)
+            {
+                var tableName = TableInfoCache.GetTable(type).TableName;
+                columnName = string.Format("{0}.{1}", tableName, columnName);
+            }
+            return columnName;
+        }
+        #region public
+        public static string BuildExpression(Expression expression, Dictionary<string, object> param, DbContextType contextType, bool singleTable = true)
+        {
+            var visitor = new SqlExpression
             {
                 Values = param,
                 SingleTable = singleTable,
-                Prefix = prefix,
+                Prefix = GetPrefix(contextType),
+                DbContextType=contextType,
             };
             visitor.Visit(expression);
             return visitor.SqlBuild.ToString();
-        }       
-        public static List<KeyValuePair<string,string>> BuildNewOrInitExpression(Expression expression, Dictionary<string, object> param, string prefix, bool singleTable = true)
+        }
+        public static List<KeyValuePair<string, string>> BuildNewOrInitExpression(Expression expression, Dictionary<string, object> param, DbContextType contextType, bool singleTable = true)
         {
             var columns = new List<KeyValuePair<string, string>>();
             if (expression is LambdaExpression)
@@ -273,9 +255,9 @@ namespace SqlCommon.Linq
             }
             else if (expression is MemberInitExpression initExpression)
             {
+                string columnExpression;
                 for (int i = 0; i < initExpression.Bindings.Count; i++)
                 {
-                    string columnName;
                     var memberName = initExpression.Bindings[i].Member.Name;
                     var argument = (initExpression.Bindings[i] as MemberAssignment).Expression;
                     if (argument is UnaryExpression)
@@ -284,48 +266,32 @@ namespace SqlCommon.Linq
                     }
                     if (argument is MemberExpression memberExpression1 && memberExpression1.Expression != null && memberExpression1.Expression.NodeType == ExpressionType.Parameter)
                     {
-                        columnName = GetColumnName(memberExpression1.Expression.Type, memberExpression1.Member.Name, singleTable);
+                        columnExpression = GetColumnName(memberExpression1.Expression.Type, memberExpression1.Member.Name, singleTable);
                     }
                     else if (argument is MemberExpression memberExpression2 && memberExpression2.Expression != null && memberExpression2.Expression.NodeType == ExpressionType.Constant)
                     {
-                        var value = GetValue(argument);
+                        var value = GetExpressionValue(argument);
                         if (value is IQuery sqlBuilder)
-                        {
-                            columnName = sqlBuilder.Build(param, prefix);
-                        }
+                            columnExpression = sqlBuilder.Build(param, contextType);
                         else
-                        {
-                            columnName = value.ToString();
-                        }
-                    }
-                    else if (argument is MethodCallExpression && (argument as MethodCallExpression).Method.DeclaringType == typeof(Convert))
-                    {
-                        var value = GetValue((argument as MethodCallExpression).Arguments[0]);
-                        if (value is IQuery sqlBuilder)
-                        {
-                            columnName = sqlBuilder.Build(param, prefix);
-                        }
-                        else
-                        {
-                            columnName = value.ToString();
-                        }
+                            columnExpression = value.ToString();
                     }
                     else if (argument is ConstantExpression)
                     {
-                        columnName = GetValue(argument).ToString();
+                        columnExpression = GetExpressionValue(argument).ToString();
                     }
                     else
                     {
-                        columnName = BuildExpression(argument, param, prefix, singleTable);
+                        columnExpression = BuildExpression(argument, param, contextType, singleTable);
                     }
-                    columns.Add(new KeyValuePair<string, string>(memberName, columnName));
+                    columns.Add(new KeyValuePair<string, string>(memberName, columnExpression));
                 }
             }
             else if (expression is NewExpression newExpression)
             {
+                string columnExpression;
                 for (int i = 0; i < newExpression.Arguments.Count; i++)
                 {
-                    string columnName;
                     var memberName = newExpression.Members[i].Name;
                     var argument = newExpression.Arguments[i];
                     if (argument is UnaryExpression)
@@ -334,47 +300,29 @@ namespace SqlCommon.Linq
                     }
                     if (argument is MemberExpression memberExpression1 && memberExpression1.Expression != null && memberExpression1.Expression.NodeType == ExpressionType.Parameter)
                     {
-                        columnName = GetColumnName(memberExpression1.Expression.Type, memberExpression1.Member.Name, singleTable);
+                        columnExpression = GetColumnName(memberExpression1.Expression.Type, memberExpression1.Member.Name, singleTable);
                     }
                     else if (argument is MemberExpression memberExpression2 && memberExpression2.Expression != null && memberExpression2.Expression.NodeType == ExpressionType.Constant)
                     {
-                        var value = GetValue(memberExpression2);
+                        var value = GetExpressionValue(memberExpression2);
                         if (value is IQuery sqlBuilder)
-                        {
-                            columnName = sqlBuilder.Build(param, prefix);
-                        }
+                            columnExpression = sqlBuilder.Build(param, contextType);
                         else
-                        {
-                            columnName = value.ToString();
-                        }
-                    }
-                    else if (argument is MethodCallExpression methodCallExpression && methodCallExpression.Method.DeclaringType == typeof(Convert))
-                    {
-                        var value = GetValue(methodCallExpression.Arguments[0]);
-                        if (value is IQuery sqlBuilder)
-                        {
-                            columnName = sqlBuilder.Build(param, prefix);
-                        }
-                        else
-                        {
-                            columnName = value.ToString();
-                        }
+                            columnExpression = value.ToString();
                     }
                     else if (argument is ConstantExpression)
-                    {
-                        columnName = GetValue(argument).ToString();
-                    }
+                        columnExpression = GetExpressionValue(argument).ToString();
                     else
                     {
-                        columnName = BuildExpression(argument, param, prefix, singleTable);
+                        columnExpression = BuildExpression(argument, param, contextType, singleTable);
                     }
-                    columns.Add(new KeyValuePair<string, string>(memberName, columnName));
+                    columns.Add(new KeyValuePair<string, string>(memberName, columnExpression));
                 }
             }
             else
             {
                 var memberName = string.Format("Expr");
-                var columnName = BuildExpression(expression, param, prefix, singleTable);
+                var columnName = BuildExpression(expression, param, contextType, singleTable);
                 columns.Add(new KeyValuePair<string, string>(memberName, columnName));
             }
             return columns;
@@ -385,10 +333,10 @@ namespace SqlCommon.Linq
             {
                 expression = lambdaExpression.Body;
             }
-            var memberExpression = expression  as MemberExpression;
+            var memberExpression = expression as MemberExpression;
             var name = memberExpression.Member.Name;
             var type = memberExpression.Expression.Type;
-            return TableInfoCache.GetColumn(type,f=>f.CSharpName==name);
+            return TableInfoCache.GetColumn(type, f => f.CSharpName == name);
         }
         public static List<ColumnInfo> BuildNewExpression(Expression expression)
         {
@@ -411,10 +359,11 @@ namespace SqlCommon.Linq
             }
             return list;
         }
-        public static List<ColumnInfo> BuildMemberInitExpression(Expression expression, Dictionary<string, object> param, string prefix)
+        public static List<ColumnInfo> BuildMemberInitExpression(Expression expression, Dictionary<string, object> param, DbContextType contextType)
         {
             var list = new List<ColumnInfo>();
             expression = (expression as LambdaExpression).Body;
+            var prefix = GetPrefix(contextType);
             if (expression is MemberInitExpression initExpression)
             {
                 var type = initExpression.Type;
@@ -423,15 +372,8 @@ namespace SqlCommon.Linq
                     Expression argument = (initExpression.Bindings[i] as MemberAssignment).Expression;
                     var name = initExpression.Bindings[i].Member.Name;
                     var columnInfo = TableInfoCache.GetColumn(type, f => f.CSharpName == name);
-                    var value = GetValue(argument);
-                    if (value is Enum)
-                    {
-                        value = Convert.ToInt32(value);
-                    }
-                    else if (value is bool)
-                    {
-                        value = Convert.ToBoolean(value) ? 1 : 0;
-                    }
+                    var value = GetExpressionValue(argument);
+                    value = GetDbValue(value, contextType);
                     var key = string.Format("{0}{1}", prefix, name);
                     param.Add(key, value);
                     list.Add(columnInfo);
@@ -439,7 +381,7 @@ namespace SqlCommon.Linq
             }
             return list;
         }
-        public static object GetValue(Expression expression)
+        public static object GetExpressionValue(Expression expression)
         {
             if ((expression is UnaryExpression unaryExpression) && unaryExpression.NodeType == ExpressionType.Convert)
             {
@@ -487,6 +429,33 @@ namespace SqlCommon.Linq
                 return Expression.Lambda(expression).Compile().DynamicInvoke();
             }
         }
+        public static object GetDbValue(object value, DbContextType contextType)
+        {
+            if (value == null)
+            {
+                return value;
+            }
+            if (value is Enum)
+            {
+                return Convert.ToInt32(value);
+            }
+            if (value is bool && contextType != DbContextType.Postgresql)
+            {
+                return Convert.ToBoolean(value) ? 1 : 0;
+            }
+            return value;
+        }
+        public static string GetPrefix(DbContextType contextType)
+        {
+            if (contextType == DbContextType.Oracle)
+            {
+                return ":";
+            }
+            else
+            {
+                return "@";
+            }
+        }
         #endregion
     }
     public static class Operator
@@ -519,7 +488,7 @@ namespace SqlCommon.Linq
             subuery.GetHashCode();
             column.GetHashCode();
             return default;
-        }       
+        }
         public static T Any<T>(T subquery) where T : ISubQuery
         {
             subquery.GetHashCode();
@@ -566,15 +535,15 @@ namespace SqlCommon.Linq
         }
         public static bool Regexp(string column, string regexp)
         {
-            return System.Text.RegularExpressions.Regex.IsMatch(column,regexp);
+            return System.Text.RegularExpressions.Regex.IsMatch(column, regexp);
         }
         public static bool NotRegexp(string column, string regexp)
         {
-            return !Regexp(column,regexp);
+            return !Regexp(column, regexp);
         }
         public static bool IsNull<T>(T column)
         {
-            return column==null;
+            return column == null;
         }
         public static bool IsNotNull<T>(T column)
         {
@@ -704,10 +673,10 @@ namespace SqlCommon.Linq
     }
     public class TableInfoCache
     {
-        private readonly static List<TableInfo> _database = new List<TableInfo>();
-        private static TableInfo Build(Type type)
+        private readonly static Dictionary<Type, TableInfo> _database = new Dictionary<Type, TableInfo>();
+        private static TableInfo GetTableInfo(Type type)
         {
-            var table = _database.Find(e => e.CSharpType == type);
+            _database.TryGetValue(type, out TableInfo table);
             if (table == null)
             {
                 var properties = type.GetProperties();
@@ -754,9 +723,9 @@ namespace SqlCommon.Linq
                 };
                 lock (_database)
                 {
-                    if (!_database.Exists(e => e.CSharpType == type))
+                    if (!_database.ContainsKey(type))
                     {
-                        _database.Add(table);
+                        _database.Add(type, table);
                     }
                 }
             }
@@ -764,15 +733,15 @@ namespace SqlCommon.Linq
         }
         public static TableInfo GetTable<T>() where T : class
         {
-            return Build(typeof(T));
+            return GetTableInfo(typeof(T));
         }
         public static TableInfo GetTable(Type type)
         {
-            return Build(type);
+            return GetTableInfo(type);
         }
         public static ColumnInfo GetColumn(Type type, Func<ColumnInfo, bool> func)
         {
-            return Build(type).Columns.Find(f => func(f));
+            return GetTableInfo(type).Columns.Find(f => func(f));
         }
     }
     public class TableInfo
@@ -800,7 +769,7 @@ namespace SqlCommon.Linq
     }
     public interface IQuery
     {
-        string Build(Dictionary<string, object> values, string prefix);
+        string Build(Dictionary<string, object> values, DbContextType contextType);
     }
     public interface ISubQuery : IQuery
     {

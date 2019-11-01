@@ -12,6 +12,11 @@ namespace SqlCommon.Tests
             return default;
         }
         [Linq.Function]
+        public static decimal MONEY(decimal? column)
+        {
+            return default;
+        }
+        [Linq.Function]
         public static T COUNT<T>(T column)
         {
             return default;

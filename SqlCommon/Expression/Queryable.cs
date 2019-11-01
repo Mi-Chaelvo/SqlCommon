@@ -428,12 +428,14 @@ namespace SqlCommon.Linq
     /// </summary>
     public abstract class Queryable
     {
-        public string Prefix = "@";
+        public string Prefix { get; internal set; } = "@";
         public int? RowIndex = null;
         public int? RowCount = null;
         public int? Timeout = null;
+
         public string ViewName = string.Empty;
         public IDbContext DbContext { get; set; }
+        public DbContextType DbContextType => DbContext?.DbContextType ?? DbContextType.Mysql;
         public TableInfo TableInfo { get; set; }
         public bool SingleTable { get; set; }
         public string WithExpression = string.Empty;
@@ -593,7 +595,7 @@ namespace SqlCommon.Linq
                 }
                 if (RowIndex != null && RowCount != null)
                 {
-                    sql.AppendFormat(" LIMIT {0},{1}", RowIndex, RowCount);
+                    sql.AppendFormat(" LIMIT {0} OFFSET {1}", RowCount, RowIndex);
                 }
                 if (!string.IsNullOrEmpty(WithExpression))
                 {
@@ -617,7 +619,7 @@ namespace SqlCommon.Linq
             else
             {
                 var filter = BuildFilter(FilterExpressions);
-                var columns = ExpressionUtil.BuildNewOrInitExpression(expression, Values, Prefix, SingleTable);
+                var columns = ExpressionUtil.BuildNewOrInitExpression(expression, Values, DbContextType, SingleTable);
                 if (filter.Count > 0)
                 {
                     columns = columns.Where(a => !filter.Exists(e => e.ColumnName == a.Value)).ToList();
@@ -641,7 +643,7 @@ namespace SqlCommon.Linq
                 }
                 else
                 {
-                    var columns = ExpressionUtil.BuildNewOrInitExpression(item, Values, Prefix, SingleTable);
+                    var columns = ExpressionUtil.BuildNewOrInitExpression(item, Values, DbContextType, SingleTable);
                     list.AddRange(columns.Select(s => s.Value));
                 }
             }
@@ -681,7 +683,7 @@ namespace SqlCommon.Linq
                 }
                 else
                 {
-                    result = ExpressionUtil.BuildExpression(item, Values, Prefix, SingleTable);
+                    result = ExpressionUtil.BuildExpression(item, Values, DbContextType, SingleTable);
                 }
                 if (sql.Length > 0 && !string.IsNullOrEmpty(result))
                 {
@@ -714,7 +716,7 @@ namespace SqlCommon.Linq
                 }
                 else
                 {
-                    var columns = ExpressionUtil.BuildNewOrInitExpression(item.Expression, Values, Prefix, SingleTable);
+                    var columns = ExpressionUtil.BuildNewOrInitExpression(item.Expression, Values, DbContextType, SingleTable);
                     list.AddRange(columns.Select(s => string.Format("{0} {1}", s.Value, item.Asc == true ? "ASC" : "DESC")));
                 }
             }
@@ -739,18 +741,20 @@ namespace SqlCommon.Linq
             var values = handler(value);
             foreach (var item in values)
             {
+                var itemValue = ExpressionUtil.GetDbValue(item.Value, DbContextType);
                 if (Values.ContainsKey(item.Key))
                 {
-                    Values[item.Key] = item.Value;
+                    Values[item.Key] = itemValue;
                 }
                 else
                 {
-                    Values.Add(item.Key, item.Value);
+                    Values.Add(item.Key, itemValue);
                 }
             }
         }
         public void SetValue(string key, object value)
         {
+            value = ExpressionUtil.GetDbValue(value, DbContextType);
             if (Values.ContainsKey(key))
             {
                 Values[key] = value;
@@ -1282,7 +1286,7 @@ namespace SqlCommon.Linq
             }
             return (new List<TResult>(), 0);
         }
-        public IQueryable<T> Set<TResult>(Expression<Func<T, TResult>> column, TResult value=default, bool condition = true)
+        public IQueryable<T> Set<TResult>(Expression<Func<T, TResult>> column, TResult value = default, bool condition = true)
         {
             if (condition)
             {
@@ -1547,7 +1551,7 @@ namespace SqlCommon.Linq
             TableInfo = TableInfoCache.GetTable(typeof(T));
             DbContext = dbContext;
             ViewName = !string.IsNullOrEmpty(viewName) ? viewName : TableInfo.TableName;
-            Prefix = "@";
+            Prefix = ExpressionUtil.GetPrefix(dbContext?.DbContextType??DbContextType.Mysql);
             SingleTable = true;
             Timeout = timeout;
         }
@@ -1558,7 +1562,7 @@ namespace SqlCommon.Linq
             sql.AppendFormat("INSERT INTO {0}", ViewName);
             if (SelectExpressions.Count > 0)
             {
-                var columns = ExpressionUtil.BuildMemberInitExpression(SelectExpressions.First(), Values, Prefix);
+                var columns = ExpressionUtil.BuildMemberInitExpression(SelectExpressions.First(), Values, DbContextType);
                 columns = columns.Except(filters).ToList();
                 sql.AppendFormat(" ({0})", string.Join(",", columns.Select(s => s.ColumnName)));
                 sql.AppendFormat(" VALUES ({0})", string.Join(",", columns.Select(s => Prefix + s.CSharpName)));
@@ -1580,21 +1584,15 @@ namespace SqlCommon.Linq
                 {
                     sql.Append(";SELECT LAST_INSERT_ID() AS Id;");
                 }
+                else if (DbContext?.DbContextType == DbContextType.Postgresql)
+                {
+                    var column = TableInfo.Columns.Where(a => a.Identity == true).FirstOrDefault();
+                    sql.AppendFormat("RETURNING {0}", column.ColumnName);
+                }
                 else
                 {
                     sql.Append(";SELECT @@IDENTITY;");
                 }
-            }
-            return sql.ToString();
-        }
-        public string BuildDelete()
-        {
-            var sql = new StringBuilder();
-            sql.AppendFormat("DELETE FROM {0}", ViewName);
-            var wheresql = BuildWhere(WhereExpressions);
-            if (wheresql.Length > 0)
-            {
-                sql.AppendFormat(" WHERE {0}", wheresql);
             }
             return sql.ToString();
         }
@@ -1605,7 +1603,7 @@ namespace SqlCommon.Linq
             var filters = BuildFilter(FilterExpressions);
             if (SelectExpressions.Count > 0)
             {
-                var columns = ExpressionUtil.BuildMemberInitExpression(SelectExpressions.First(), Values, Prefix);
+                var columns = ExpressionUtil.BuildMemberInitExpression(SelectExpressions.First(), Values,DbContextType);
                 columns = columns.Where(a => a.ColumnKey != ColumnKey.Primary).Except(filters).ToList();
                 sql.AppendFormat(" {0}", string.Join(",", columns.Select(s => string.Format("{0} = {1}{2}", s.ColumnName, Prefix, s.CSharpName))));
             }
@@ -1618,11 +1616,11 @@ namespace SqlCommon.Linq
                     var column = ExpressionUtil.BuildMemberExpression(item.Key);
                     if (item.Value is ISubQuery subquery)
                     {
-                        sql.AppendFormat("{0} = {1}", column.ColumnName, subquery.Build(Values, Prefix));
+                        sql.AppendFormat("{0} = {1}", column.ColumnName, subquery.Build(Values, DbContextType));
                     }
                     else if (item.Value is Expression expression)
                     {
-                        sql.AppendFormat("{0} = {1}", column.ColumnName, ExpressionUtil.BuildExpression(expression, Values, Prefix));
+                        sql.AppendFormat("{0} = {1}", column.ColumnName, ExpressionUtil.BuildExpression(expression, Values, DbContextType));
                     }
                     else
                     {
@@ -1638,7 +1636,7 @@ namespace SqlCommon.Linq
             }
             else
             {
-                var columns = TableInfo.Columns.Where(a => a.ColumnKey != ColumnKey.Primary).Except(filters);
+                var columns = TableInfo.Columns.Where(a => a.Identity == false).Except(filters);
                 sql.AppendFormat(" {0}", string.Join(",", columns.Select(s => string.Format("{0} = {1}{2}", s.ColumnName, Prefix, s.CSharpName))));
             }
             var wheresql = BuildWhere(WhereExpressions);
@@ -1653,6 +1651,17 @@ namespace SqlCommon.Linq
                 {
                     sql.AppendFormat(" WHERE {0} = {1}{2}", column.ColumnName, Prefix, column.CSharpName);
                 }
+            }
+            return sql.ToString();
+        }
+        public string BuildDelete()
+        {
+            var sql = new StringBuilder();
+            sql.AppendFormat("DELETE FROM {0}", ViewName);
+            var wheresql = BuildWhere(WhereExpressions);
+            if (wheresql.Length > 0)
+            {
+                sql.AppendFormat(" WHERE {0}", wheresql);
             }
             return sql.ToString();
         }
@@ -1697,7 +1706,7 @@ namespace SqlCommon.Linq
         {
             TableInfo = null;
             DbContext = dbContext;
-            Prefix = "@";
+            Prefix = ExpressionUtil.GetPrefix(DbContextType);
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName;
@@ -1788,7 +1797,7 @@ namespace SqlCommon.Linq
         }
         public IQueryable<T1, T2> Join(Expression<Func<T1, T2, bool?>> expression, JoinType join = JoinType.Inner)
         {
-            var onExpression = ExpressionUtil.BuildExpression(expression, Values, Prefix, SingleTable);
+            var onExpression = ExpressionUtil.BuildExpression(expression, Values, DbContextType, SingleTable);
             var table1Name = TableInfoCache.GetTable<T1>().TableName;
             var table2Name = TableInfoCache.GetTable<T2>().TableName;
             var joinType = string.Format("{0} JOIN", join.ToString().ToUpper());
@@ -2024,7 +2033,7 @@ namespace SqlCommon.Linq
         {
             TableInfo = null;
             DbContext = dbContext;
-            Prefix = "@";
+            Prefix = ExpressionUtil.GetPrefix(DbContextType); ;
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName ?? string.Empty;
@@ -2122,7 +2131,7 @@ namespace SqlCommon.Linq
         }
         public IQueryable<T1, T2, T3> Join<V1, V2>(Expression<Func<V1, V2, bool?>> expression, JoinType join = JoinType.Inner) where V1 : class where V2 : class
         {
-            var onExpression = ExpressionUtil.BuildExpression(expression, Values, Prefix, SingleTable);
+            var onExpression = ExpressionUtil.BuildExpression(expression, Values, DbContextType, SingleTable);
             var table1Name = TableInfoCache.GetTable<V1>().TableName;
             var table2Name = TableInfoCache.GetTable<V2>().TableName;
             var joinType = string.Format("{0} JOIN", join.ToString().ToUpper());
@@ -2456,7 +2465,7 @@ namespace SqlCommon.Linq
         }
         public IQueryable<T1, T2, T3, T4> Join<V1, V2>(Expression<Func<V1, V2, bool?>> expression, JoinType join = JoinType.Inner) where V1 : class where V2 : class
         {
-            var onExpression = ExpressionUtil.BuildExpression(expression, Values, Prefix, SingleTable);
+            var onExpression = ExpressionUtil.BuildExpression(expression, Values, DbContextType, SingleTable);
             var table1Name = TableInfoCache.GetTable<V1>().TableName;
             var table2Name = TableInfoCache.GetTable<V2>().TableName;
             var joinType = string.Format("{0} JOIN", join.ToString().ToUpper());
