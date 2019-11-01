@@ -9,7 +9,6 @@ namespace SqlCommon.Linq
 {
     public class SqlExpression : ExpressionVisitor
     {
-        #region propertys
         public readonly StringBuilder SqlBuild = new StringBuilder();
         public Dictionary<string, object> Values { get; set; }
         private string ValueName = "Name";
@@ -18,9 +17,6 @@ namespace SqlCommon.Linq
         private string Operator { get; set; }
         public bool SingleTable { get; set; }
         public DbContextType DbContextType { get; set; }
-        #endregion
-
-        #region override
         protected override Expression VisitMember(MemberExpression node)
         {
             if (node.Expression != null && node.Expression.NodeType == ExpressionType.Parameter)
@@ -173,9 +169,6 @@ namespace SqlCommon.Linq
             }
             return node;
         }
-        #endregion
-
-        #region private
         private void SetName(MemberExpression expression)
         {
             var memberName = expression.Member.Name;
@@ -213,7 +206,6 @@ namespace SqlCommon.Linq
                 SqlBuild.Append(key);
             }
         }
-        #endregion
     }
     public class ExpressionUtil : ExpressionVisitor
     {
@@ -227,7 +219,6 @@ namespace SqlCommon.Linq
             }
             return columnName;
         }
-        #region public
         public static string BuildExpression(Expression expression, Dictionary<string, object> param, DbContextType contextType, bool singleTable = true)
         {
             var visitor = new SqlExpression
@@ -235,7 +226,7 @@ namespace SqlCommon.Linq
                 Values = param,
                 SingleTable = singleTable,
                 Prefix = GetPrefix(contextType),
-                DbContextType=contextType,
+                DbContextType = contextType,
             };
             visitor.Visit(expression);
             return visitor.SqlBuild.ToString();
@@ -277,13 +268,9 @@ namespace SqlCommon.Linq
                             columnExpression = value.ToString();
                     }
                     else if (argument is ConstantExpression)
-                    {
                         columnExpression = GetExpressionValue(argument).ToString();
-                    }
                     else
-                    {
                         columnExpression = BuildExpression(argument, param, contextType, singleTable);
-                    }
                     columns.Add(new KeyValuePair<string, string>(memberName, columnExpression));
                 }
             }
@@ -313,9 +300,7 @@ namespace SqlCommon.Linq
                     else if (argument is ConstantExpression)
                         columnExpression = GetExpressionValue(argument).ToString();
                     else
-                    {
                         columnExpression = BuildExpression(argument, param, contextType, singleTable);
-                    }
                     columns.Add(new KeyValuePair<string, string>(memberName, columnExpression));
                 }
             }
@@ -383,7 +368,7 @@ namespace SqlCommon.Linq
         }
         public static object GetExpressionValue(Expression expression)
         {
-            if ((expression is UnaryExpression unaryExpression) && unaryExpression.NodeType == ExpressionType.Convert)
+            if (expression is UnaryExpression unaryExpression && unaryExpression.NodeType == ExpressionType.Convert)
             {
                 expression = unaryExpression.Operand;
             }
@@ -406,166 +391,127 @@ namespace SqlCommon.Linq
                     var exp = exps.Pop();
                     var mif = mifs.Pop();
                     if (exp is ConstantExpression cex)
-                    {
                         value = cex.Value;
-                    }
                     if (mif is System.Reflection.PropertyInfo pif)
-                    {
                         value = pif.GetValue(value);
-                    }
                     else if (mif is System.Reflection.FieldInfo fif)
-                    {
                         value = fif.GetValue(value);
-                    }
                 }
                 return value;
             }
             else if (expression is ConstantExpression constant)
-            {
                 return constant.Value;
-            }
             else
-            {
                 return Expression.Lambda(expression).Compile().DynamicInvoke();
-            }
         }
         public static object GetDbValue(object value, DbContextType contextType)
         {
             if (value == null)
-            {
                 return value;
-            }
             if (value is Enum)
-            {
                 return Convert.ToInt32(value);
-            }
             if (value is bool && contextType != DbContextType.Postgresql)
-            {
                 return Convert.ToBoolean(value) ? 1 : 0;
-            }
             return value;
         }
         public static string GetPrefix(DbContextType contextType)
         {
             if (contextType == DbContextType.Oracle)
-            {
                 return ":";
-            }
             else
-            {
                 return "@";
-            }
         }
-        #endregion
     }
     public static class Operator
     {
-        #region extension
         public static bool In<T>(T column, IEnumerable<T> list)
         {
-            return list.Contains(column);
+            return default;
         }
         public static bool In<T>(T column, params T[] values)
         {
-            return values.Contains(column);
+            return default;
         }
         public static bool In<T>(T column, ISubQuery subuery)
         {
-            subuery.GetHashCode();
-            column.GetHashCode();
             return default;
         }
         public static bool NotIn<T>(T column, IEnumerable<T> enumerable)
         {
-            return enumerable.Contains(column);
+            return default;
         }
         public static bool NotIn<T>(T column, params T[] values)
         {
-            return values.Contains(column);
+            return default;
         }
         public static bool NotIn(ValueType column, ISubQuery subuery)
         {
-            subuery.GetHashCode();
-            column.GetHashCode();
             return default;
         }
         public static T Any<T>(T subquery) where T : ISubQuery
         {
-            subquery.GetHashCode();
             return default;
         }
         public static T All<T>(T subquery) where T : ISubQuery
         {
-            subquery.GetHashCode();
             return default;
         }
         public static bool Exists(ISubQuery subquery)
         {
-            subquery.GetHashCode();
             return default;
         }
         public static bool NotExists(ISubQuery subquery)
         {
-            subquery.GetHashCode();
             return default;
         }
         public static bool Contains(string column, string text)
         {
-            return column.Contains(text);
+            return default;
         }
         public static bool NotContains(string column, string text)
         {
-            return !column.Contains(text);
+            return default;
         }
         public static bool StartsWith(string column, string text)
         {
-            return column.StartsWith(text);
+            return default;
         }
         public static bool NotStartsWith(string column, string text)
         {
-            return !column.StartsWith(text);
+            return default;
         }
         public static bool EndsWith(string column, string text)
         {
-            return column.EndsWith(text);
+            return default;
         }
         public static bool NotEndsWith(string column, string text)
         {
-            return !column.EndsWith(text);
+            return default;
         }
         public static bool Regexp(string column, string regexp)
         {
-            return System.Text.RegularExpressions.Regex.IsMatch(column, regexp);
+            return default;
         }
         public static bool NotRegexp(string column, string regexp)
         {
-            return !Regexp(column, regexp);
+            return default;
         }
         public static bool IsNull<T>(T column)
         {
-            return column == null;
+            return default;
         }
         public static bool IsNotNull<T>(T column)
         {
-            return !IsNull(column);
+            return default;
         }
         public static bool Between<T>(T column, T value1, T value2)
         {
-            column.GetHashCode();
-            value1.GetHashCode();
-            value2.GetHashCode();
             return default;
         }
         public static bool NotBetween<T>(T column, T value1, T value2)
         {
-            column.GetHashCode();
-            value1.GetHashCode();
-            value2.GetHashCode();
             return default;
         }
-        #endregion
-
-        #region utils
         public static string GetOperator(string operatorType)
         {
             switch (operatorType)
@@ -669,7 +615,6 @@ namespace SqlCommon.Linq
             }
             return condition;
         }
-        #endregion
     }
     public class TableInfoCache
     {
@@ -686,9 +631,9 @@ namespace SqlCommon.Linq
                     var columnName = item.Name;
                     var identity = false;
                     var columnKey = ColumnKey.None;
-                    if (item.GetCustomAttributes(typeof(ColumnAttribute), true).Length > 0)
+                    var columnAttribute = item.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
+                    if (columnAttribute != null)
                     {
-                        var columnAttribute = item.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
                         if (!columnAttribute.IsColumn)
                         {
                             continue;
@@ -724,9 +669,7 @@ namespace SqlCommon.Linq
                 lock (_database)
                 {
                     if (!_database.ContainsKey(type))
-                    {
                         _database.Add(type, table);
-                    }
                 }
             }
             return table;

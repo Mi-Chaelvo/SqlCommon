@@ -432,7 +432,6 @@ namespace SqlCommon.Linq
         public int? RowIndex = null;
         public int? RowCount = null;
         public int? Timeout = null;
-
         public string ViewName = string.Empty;
         public IDbContext DbContext { get; set; }
         public DbContextType DbContextType => DbContext?.DbContextType ?? DbContextType.Mysql;
@@ -729,27 +728,30 @@ namespace SqlCommon.Linq
     }
     public class SqlQuery<T> : Queryable, IQueryable<T> where T : class
     {
+        public SqlQuery()
+        {
+
+        }
+        public SqlQuery(IDbContext dbContext = null, string viewName = null, int? timeout = null)
+        {
+            TableInfo = TableInfoCache.GetTable(typeof(T));
+            DbContext = dbContext;
+            ViewName = !string.IsNullOrEmpty(viewName) ? viewName : TableInfo.TableName;
+            Prefix = ExpressionUtil.GetPrefix(dbContext?.DbContextType ?? DbContextType.Mysql);
+            SingleTable = true;
+            Timeout = timeout;
+        }
         public List<Expression> SumExpressions = new List<Expression>();
         public List<KeyValuePair<Expression, object>> SetExpressions = new List<KeyValuePair<Expression, object>>();
         public void SetValue(object value)
         {
             if (value == null)
-            {
                 return;
-            }
             var handler = TypeConvert.GetDeserializer(value.GetType());
             var values = handler(value);
             foreach (var item in values)
             {
-                var itemValue = ExpressionUtil.GetDbValue(item.Value, DbContextType);
-                if (Values.ContainsKey(item.Key))
-                {
-                    Values[item.Key] = itemValue;
-                }
-                else
-                {
-                    Values.Add(item.Key, itemValue);
-                }
+                SetValue(item.Key, item.Value);
             }
         }
         public void SetValue(string key, object value)
@@ -1546,15 +1548,6 @@ namespace SqlCommon.Linq
             }
             return this;
         }
-        public SqlQuery(IDbContext dbContext = null, string viewName = null, int? timeout = null)
-        {
-            TableInfo = TableInfoCache.GetTable(typeof(T));
-            DbContext = dbContext;
-            ViewName = !string.IsNullOrEmpty(viewName) ? viewName : TableInfo.TableName;
-            Prefix = ExpressionUtil.GetPrefix(dbContext?.DbContextType??DbContextType.Mysql);
-            SingleTable = true;
-            Timeout = timeout;
-        }
         public string BuildInsert(bool returnId = false)
         {
             var sql = new StringBuilder();
@@ -1603,7 +1596,7 @@ namespace SqlCommon.Linq
             var filters = BuildFilter(FilterExpressions);
             if (SelectExpressions.Count > 0)
             {
-                var columns = ExpressionUtil.BuildMemberInitExpression(SelectExpressions.First(), Values,DbContextType);
+                var columns = ExpressionUtil.BuildMemberInitExpression(SelectExpressions.First(), Values, DbContextType);
                 columns = columns.Where(a => a.ColumnKey != ColumnKey.Primary).Except(filters).ToList();
                 sql.AppendFormat(" {0}", string.Join(",", columns.Select(s => string.Format("{0} = {1}{2}", s.ColumnName, Prefix, s.CSharpName))));
             }
@@ -1702,11 +1695,14 @@ namespace SqlCommon.Linq
     }
     public class SqlQuery<T1, T2> : Queryable, IQueryable<T1, T2> where T1 : class where T2 : class
     {
+        public SqlQuery()
+        {
+        }
         public SqlQuery(IDbContext dbContext = null, string viewName = null, int? timeout = null)
         {
             TableInfo = null;
             DbContext = dbContext;
-            Prefix = ExpressionUtil.GetPrefix(DbContextType);
+            Prefix = ExpressionUtil.GetPrefix(dbContext?.DbContextType ?? DbContextType.Mysql);
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName;
@@ -2029,14 +2025,18 @@ namespace SqlCommon.Linq
     }
     public class SqlQuery<T1, T2, T3> : Queryable, IQueryable<T1, T2, T3> where T1 : class where T2 : class where T3 : class
     {
+        public SqlQuery()
+        {
+
+        }
         public SqlQuery(IDbContext dbContext = null, string viewName = null, int? timeout = null)
         {
             TableInfo = null;
             DbContext = dbContext;
-            Prefix = ExpressionUtil.GetPrefix(DbContextType); ;
+            Prefix = ExpressionUtil.GetPrefix(dbContext?.DbContextType ?? DbContextType.Mysql);
             SingleTable = false;
             Timeout = timeout;
-            ViewName = viewName ?? string.Empty;
+            ViewName = viewName;
         }
         public List<string> TableNames = new List<string>();
         public long Count(string expression = null, bool condition = true)
@@ -2363,11 +2363,15 @@ namespace SqlCommon.Linq
     }
     public class SqlQuery<T1, T2, T3, T4> : Queryable, IQueryable<T1, T2, T3, T4> where T1 : class where T2 : class where T3 : class where T4 : class
     {
+        public SqlQuery()
+        {
+
+        }
         public SqlQuery(IDbContext dbContext = null, string viewName = null, int? timeout = null)
         {
             TableInfo = null;
             DbContext = dbContext;
-            Prefix = "@";
+            Prefix = ExpressionUtil.GetPrefix(dbContext?.DbContextType ?? DbContextType.Mysql);
             SingleTable = false;
             Timeout = timeout;
             ViewName = viewName;

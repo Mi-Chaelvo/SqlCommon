@@ -10,24 +10,6 @@ namespace SqlCommon.Tests
 {
     public class PgsqlTest
     {
-        [Test]
-        public void TestMapper()
-        {
-            var connection = new Npgsql.NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=postgres;Password=1024;Database=test;");
-            using (IDbContext db = new DbProxyContext(connection, DbContextType.Postgresql))
-            {
-                db.Open();
-                try
-                {
-                    var list = db.Connection.ExecuteQuery<Student>("select id as Id,name as Name from student where id in  @Id", new { Id = new int[] { 1, 2, 3 } }).ToList();
-                }
-                catch (Exception e)
-                {
-
-                    throw;
-                }
-            }
-        }
 
         [Test]
         public void TestInsert()
@@ -152,7 +134,7 @@ namespace SqlCommon.Tests
 
                     throw;
                 }
-               
+
 
             }
         }
@@ -204,31 +186,22 @@ namespace SqlCommon.Tests
             using (IDbContext db = new DbProxyContext(connection, DbContextType.Postgresql))
             {
                 db.Open();
-                try
-                {
-                    var list0 = db.From<Student>().Select(s => SqlFun.CONCAT(s.Name, s.Score)).ToList();
-                    var list1 = db.From<Student>().Select().ToList();
-                    var list2 = db.From<Student>().Where(a => a.IsDelete == false).Select().ToList();
-                    var list3 = db.From<Student>().OrderBy(a => a.Id).OrderByDescending(a => a.Balance).Select().ToList();
-                    var list4 = db.From<Student>().Take(4).Select().ToList();
-                    var list5 = db.From<Student>().Take(4).Skip(2, 2).Select().ToList();
-                    var list6 = db.From<Student>().Select(s => new { s.IsDelete, s.Id, s.Name }).ToList();
-                    var list7 = db.From<Student>().Select(s => new Student { IsDelete = s.IsDelete, Id = s.Id, Name = s.Name }).ToList();
-                }
-                catch (Exception e)
-                {
-
-                    throw;
-                }
-               
+                var list0 = db.From<Student>().Select(s => SqlFun.CONCAT(s.Name, s.Score)).ToList();
+                var list1 = db.From<Student>().Select().ToList();
+                var list2 = db.From<Student>().Where(a => a.IsDelete == false).Select().ToList();
+                var list3 = db.From<Student>().OrderBy(a => a.Id).OrderByDescending(a => a.Balance).Select().ToList();
+                var list4 = db.From<Student>().Take(4).Select().ToList();
+                var list5 = db.From<Student>().Take(4).Skip(2, 2).Select().ToList();
+                var list6 = db.From<Student>().Select(s => new { s.IsDelete, s.Id, s.Name }).ToList();
+                var list7 = db.From<Student>().Select(s => new Student { IsDelete = s.IsDelete, Id = s.Id, Name = s.Name }).ToList();
             }
         }
 
         [Test]
         public void TestGroup()
         {
-            var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
-            using (IDbContext db = new DbProxyContext(connection, DbContextType.Mysql))
+            var connection = new Npgsql.NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=postgres;Password=1024;Database=test;");
+            using (IDbContext db = new DbProxyContext(connection, DbContextType.Postgresql))
             {
                 db.Open();
                 var list = db.From<Student>()
@@ -238,7 +211,7 @@ namespace SqlCommon.Tests
                     .Select(s => new
                     {
                         s.Name,
-                        Names = SqlFun.GROUP_CONCAT(s.Name),
+                        //Names = SqlFun.GROUP_CONCAT(s.Name),
                         Count = SqlFun.COUNT(1L),
                         Balance = SqlFun.SUM(s.Balance)
                     }).ToList();
@@ -248,8 +221,8 @@ namespace SqlCommon.Tests
         [Test]
         public void TestPage()
         {
-            var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
-            using (IDbContext db = new DbProxyContext(connection, DbContextType.Mysql))
+            var connection = new Npgsql.NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=postgres;Password=1024;Database=test;");
+            using (IDbContext db = new DbProxyContext(connection, DbContextType.Postgresql))
             {
                 db.Open();
 
@@ -271,8 +244,8 @@ namespace SqlCommon.Tests
         [Test]
         public void TestJoin()
         {
-            var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
-            using (IDbContext db = new DbProxyContext(connection, DbContextType.Mysql))
+            var connection = new Npgsql.NpgsqlConnection("Server=127.0.0.1;Port=5432;User Id=postgres;Password=1024;Database=test;");
+            using (IDbContext db = new DbProxyContext(connection, DbContextType.Postgresql))
             {
                 db.Open();
                 var list0 = db.From<Student, Stuclass>()
@@ -301,7 +274,8 @@ namespace SqlCommon.Tests
                    .SelectMany((a, b) => new
                    {
                        Class = b.Name,
-                       StuNames = SqlFun.GROUP_CONCAT(a.Name)
+                       Count = SqlFun.COUNT(1L),
+                       //StuNames = SqlFun.GROUP_CONCAT(a.Name)
                    });
                 var list3 = db.From<Student, Stuclass, Stuid>()
                      .Join((Student a, Stuclass b) => a.Id == b.Sid)

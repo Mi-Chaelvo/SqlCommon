@@ -95,7 +95,7 @@
       }
     },
     "C:\\SqlCommon\\SqlCommon\\SqlCommon.csproj": {
-      "version": "2.0.0",
+      "version": "2.0.1",
       "restore": {
         "projectUniqueName": "C:\\SqlCommon\\SqlCommon\\SqlCommon.csproj",
         "projectName": "SqlCommon",

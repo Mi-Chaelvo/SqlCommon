@@ -14,13 +14,13 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("chaeyeon")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("chaeyeon")]
-[assembly: System.Reflection.AssemblyDescriptionAttribute("A high performance Micro-ORM supporting SQL Server, MySQL, Sqlite, SqlCE, Firebir" +
-    "d etc..")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.0")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("A high performance Micro-ORM supporting SQL Server, MySQL, Sqlite, Postgresql, et" +
+    "c..")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("2.0.1.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("2.0.1")]
 [assembly: System.Reflection.AssemblyProductAttribute("SqlCommon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SqlCommon")]
-[assembly: System.Reflection.AssemblyVersionAttribute("2.0.0.0")]
+[assembly: System.Reflection.AssemblyVersionAttribute("2.0.1.0")]
 
 // 由 MSBuild WriteCodeFragment 类生成。
 
