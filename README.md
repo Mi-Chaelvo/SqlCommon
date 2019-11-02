@@ -9,7 +9,7 @@ QQ群：642555086
 文档：https://github.com/1448376744/SqlCommon/wiki
 
 ## 说明
-(我想使用dapper):[https://github.com/1448376744/SqlCommon/wiki/%E4%BD%BF%E7%94%A8Dapper]
+(我想使用dapper)[https://github.com/1448376744/SqlCommon/wiki/%E4%BD%BF%E7%94%A8Dapper]
 ## mapper
 
 ``` C#
