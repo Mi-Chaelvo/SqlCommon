@@ -13,6 +13,7 @@ namespace SqlCommon
 {
     public interface ISqlMapper
     {
+        IDbConnection Connection { get; }
         IEnumerable<T> ExecuteQuery<T>(string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
         (IEnumerable<T1>, IEnumerable<T2>) ExecuteQuery<T1, T2>(string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
         Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql, object param = null, IDbTransaction transaction = null, int? commandTimeout = null, CommandType? commandType = null);
@@ -27,7 +28,7 @@ namespace SqlCommon
     /// </summary>
     public class SqlMapper : ISqlMapper
     {
-        private readonly IDbConnection Connection = null;
+        public  IDbConnection Connection { get; private set; }
         private readonly ITypeMapper TypeMapper = null;
         public SqlMapper(IDbConnection connection, ITypeMapper typeMapper)
         {

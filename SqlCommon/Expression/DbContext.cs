@@ -51,12 +51,19 @@ namespace SqlCommon.Linq
     }
     public class DbContext : IDbContext
     {
-        public DbContext(IDbConnection connection, DbContextType contextType, ISqlMapper sqlMapper = null)
+        public DbContext(IDbConnection connection, DbContextType contextType, ITypeMapper typeMapper=null)
         {
             Connection = connection;
             DbContextType = contextType;
             DbContextState = DbContextState.Closed;
-            SqlMapper = sqlMapper ?? new SqlMapper(connection, new TypeMapper());
+            SqlMapper = new SqlMapper(connection, typeMapper ?? new TypeMapper());
+        }
+        public DbContext(ISqlMapper sqlMapper, DbContextType contextType)
+        {
+            Connection = sqlMapper.Connection;
+            DbContextType = contextType;
+            DbContextState = DbContextState.Closed;
+            SqlMapper = sqlMapper;
         }
         public ISqlMapper SqlMapper { get; }
         public DbContextState DbContextState { get; private set; }

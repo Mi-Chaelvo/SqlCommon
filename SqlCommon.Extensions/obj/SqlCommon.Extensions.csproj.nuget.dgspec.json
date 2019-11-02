@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\SqlCommon\\SqlCommon.Tests\\SqlCommon.Tests.csproj": {}
+    "C:\\SqlCommon\\SqlCommon.Extensions\\SqlCommon.Extensions.csproj": {}
   },
   "projects": {
-    "C:\\SqlCommon\\SqlCommon.Tests\\SqlCommon.Tests.csproj": {
+    "C:\\SqlCommon\\SqlCommon.Extensions\\SqlCommon.Extensions.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\SqlCommon\\SqlCommon.Tests\\SqlCommon.Tests.csproj",
-        "projectName": "SqlCommon.Tests",
-        "projectPath": "C:\\SqlCommon\\SqlCommon.Tests\\SqlCommon.Tests.csproj",
+        "projectUniqueName": "C:\\SqlCommon\\SqlCommon.Extensions\\SqlCommon.Extensions.csproj",
+        "projectName": "SqlCommon.Extensions",
+        "projectPath": "C:\\SqlCommon\\SqlCommon.Extensions\\SqlCommon.Extensions.csproj",
         "packagesPath": "C:\\Users\\14483\\.nuget\\packages\\",
-        "outputPath": "C:\\SqlCommon\\SqlCommon.Tests\\obj\\",
+        "outputPath": "C:\\SqlCommon\\SqlCommon.Extensions\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -45,6 +45,10 @@
       "frameworks": {
         "netcoreapp2.2": {
           "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.0.4, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
               "version": "[16.2.0, )"
@@ -62,18 +66,6 @@
             "NUnit3TestAdapter": {
               "target": "Package",
               "version": "[3.13.0, )"
-            },
-            "Npgsql": {
-              "target": "Package",
-              "version": "[4.1.1, )"
-            },
-            "System.Data.SQLite.Core": {
-              "target": "Package",
-              "version": "[1.0.112, )"
-            },
-            "System.Data.SqlClient": {
-              "target": "Package",
-              "version": "[4.7.0, )"
             },
             "nunit": {
               "target": "Package",

@@ -6,60 +6,50 @@
     <members>
         <member name="T:SqlCommon.SqlMapper">
             <summary>
-            Extended connection
+            Execute script
             </summary>
         </member>
-        <member name="F:SqlCommon.SqlMapper.TypeMapper">
-            <summary>
-            Type mapper
-            </summary>
-        </member>
-        <member name="P:SqlCommon.SqlMapper.MatchNamesWithUnderscores">
-            <summary>
-            Does name matching ignore underscores
-            </summary>
-        </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteQuery``1(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteQuery``1(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Executes a query, returning the data typed as T.
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteQuery``2(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteQuery``2(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Executes Multi query, returning the data typed as valueTuple.
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``1(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Executes a query, returning the data typed as T
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``2(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteQueryAsync``2(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
              <summary>
             Executes Multi query, returning the data typed as valueTuple.
              </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteNonQuery(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteNonQuery(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute parameterized SQL
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteNonQueryAsync(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteNonQueryAsync(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute a command asynchronously using Task.
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteScalar``1(System.Data.IDbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteScalar``1(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute parameterized SQL that selects a single value.
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.ExecuteScalarAsync``1(System.Data.Common.DbConnection,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.ExecuteScalarAsync``1(System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             Execute parameterized SQL that selects a single value.
             </summary>
         </member>
-        <member name="M:SqlCommon.SqlMapper.Initialize(System.Data.IDbCommand,System.Data.IDbTransaction,System.String,System.Object,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
+        <member name="M:SqlCommon.SqlMapper.Initialize(System.Data.IDbCommand,System.String,System.Object,System.Data.IDbTransaction,System.Nullable{System.Int32},System.Nullable{System.Data.CommandType})">
             <summary>
             handler command
             </summary>      
@@ -490,7 +480,7 @@
             OrderBy Expression
             </summary>
         </member>
-        <member name="T:SqlCommon.Linq.Queryable">
+        <member name="T:SqlCommon.Linq.BaseQuery">
             <summary>
             Query common
             </summary>
