@@ -426,7 +426,7 @@ namespace SqlCommon.Linq
     /// <summary>
     /// Query common
     /// </summary>
-    public abstract class Queryable
+    public abstract class BaseQuery
     {
         public string Prefix { get; internal set; } = "@";
         public int? RowIndex = null;
@@ -726,7 +726,7 @@ namespace SqlCommon.Linq
             return BuildWhere(expressions);
         }
     }
-    public class SqlQuery<T> : Queryable, IQueryable<T> where T : class
+    public class SqlQuery<T> : BaseQuery, IQueryable<T> where T : class
     {
         public SqlQuery()
         {
@@ -1693,7 +1693,7 @@ namespace SqlCommon.Linq
             return sql.ToString();
         }
     }
-    public class SqlQuery<T1, T2> : Queryable, IQueryable<T1, T2> where T1 : class where T2 : class
+    public class SqlQuery<T1, T2> : BaseQuery, IQueryable<T1, T2> where T1 : class where T2 : class
     {
         public SqlQuery()
         {
@@ -2023,7 +2023,7 @@ namespace SqlCommon.Linq
             return this;
         }
     }
-    public class SqlQuery<T1, T2, T3> : Queryable, IQueryable<T1, T2, T3> where T1 : class where T2 : class where T3 : class
+    public class SqlQuery<T1, T2, T3> : BaseQuery, IQueryable<T1, T2, T3> where T1 : class where T2 : class where T3 : class
     {
         public SqlQuery()
         {
@@ -2361,7 +2361,7 @@ namespace SqlCommon.Linq
             return this;
         }
     }
-    public class SqlQuery<T1, T2, T3, T4> : Queryable, IQueryable<T1, T2, T3, T4> where T1 : class where T2 : class where T3 : class where T4 : class
+    public class SqlQuery<T1, T2, T3, T4> : BaseQuery, IQueryable<T1, T2, T3, T4> where T1 : class where T2 : class where T3 : class where T4 : class
     {
         public SqlQuery()
         {

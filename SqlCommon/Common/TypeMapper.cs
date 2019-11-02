@@ -23,6 +23,7 @@ namespace SqlCommon
     /// </summary>
     public class TypeMapper : ITypeMapper
     {
+        public bool MatchNamesWithUnderscores { get; set; }
         /// <summary>
         /// Find parametric constructors.
         /// If there is no default constructor, the constructor with the most parameters is returned.
@@ -48,7 +49,7 @@ namespace SqlCommon
                 {
                     return item;
                 }
-                else if (SqlMapper.MatchNamesWithUnderscores && item.DataName.Replace("_", "").Equals(parameterInfo.Name, StringComparison.OrdinalIgnoreCase))
+                else if (MatchNamesWithUnderscores && item.DataName.Replace("_", "").Equals(parameterInfo.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }
@@ -66,7 +67,7 @@ namespace SqlCommon
                 {
                     return item;
                 }
-                else if (SqlMapper.MatchNamesWithUnderscores && item.Name.Equals(dataInfo.DataName.Replace("_", ""), StringComparison.OrdinalIgnoreCase))
+                else if (MatchNamesWithUnderscores && item.Name.Equals(dataInfo.DataName.Replace("_", ""), StringComparison.OrdinalIgnoreCase))
                 {
                     return item;
                 }
@@ -140,6 +141,10 @@ namespace SqlCommon
         private bool IsNullableType(Type type)
         {
             return Nullable.GetUnderlyingType(type) != null;
+        }
+        public TypeMapper(bool matchNamesWithUnderscores = false)
+        {
+            MatchNamesWithUnderscores = matchNamesWithUnderscores;
         }
     }
     public static class DataConvertMethod

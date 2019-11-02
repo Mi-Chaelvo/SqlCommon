@@ -30,6 +30,7 @@ namespace SqlCommon.Linq
     }
     public interface IDbContext : IDisposable
     {
+        ISqlMapper SqlMapper { get; }
         DbContextState DbContextState { get; }
         DbContextType DbContextType { get; }
         int ExecuteNonQuery(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text);
@@ -50,12 +51,14 @@ namespace SqlCommon.Linq
     }
     public class DbContext : IDbContext
     {
-        public DbContext(IDbConnection connection, DbContextType contextType)
+        public DbContext(IDbConnection connection, DbContextType contextType, ISqlMapper sqlMapper = null)
         {
             Connection = connection;
             DbContextType = contextType;
             DbContextState = DbContextState.Closed;
+            SqlMapper = sqlMapper ?? new SqlMapper(connection, new TypeMapper());
         }
+        public ISqlMapper SqlMapper { get; }
         public DbContextState DbContextState { get; private set; }
         public DbContextType DbContextType { get; private set; }
         public IDbConnection Connection { get; private set; }
@@ -86,37 +89,37 @@ namespace SqlCommon.Linq
         }
         public virtual (IEnumerable<T1>, IEnumerable<T2>) ExecuteQuery<T1, T2>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
-            return Connection.ExecuteQuery<T1, T2>(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteQuery<T1, T2>(sql, param, Transaction, commandTimeout, commandType);
         }
         public virtual Task<(IEnumerable<T1>, IEnumerable<T2>)> ExecuteQueryAsync<T1, T2>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
-            return (Connection as DbConnection).ExecuteQueryAsync<T1, T2>(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteQueryAsync<T1, T2>(sql, param, Transaction, commandTimeout, commandType);
         }
         public virtual Task<int> ExecuteNonQueryAsync(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
-            return (Connection as DbConnection).ExecuteNonQueryAsync(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteNonQueryAsync(sql, param, Transaction, commandTimeout, commandType);
         }
         public virtual int ExecuteNonQuery(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
-            return Connection.ExecuteNonQuery(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteNonQuery(sql, param, Transaction, commandTimeout, commandType);
         }
         public virtual IEnumerable<T> ExecuteQuery<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
-            return Connection.ExecuteQuery<T>(sql, param, Transaction, commandTimeout, commandType).ToList();
+            return SqlMapper.ExecuteQuery<T>(sql, param, Transaction, commandTimeout, commandType).ToList();
         }
         public virtual Task<IEnumerable<T>> ExecuteQueryAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType? commandType = CommandType.Text)
         {
-            return (Connection as DbConnection).ExecuteQueryAsync<T>(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteQueryAsync<T>(sql, param, Transaction, commandTimeout, commandType);
         }
         public virtual T ExecuteScalar<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
-            return Connection.ExecuteScalar<T>(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteScalar<T>(sql, param, Transaction, commandTimeout, commandType);
         }
         public virtual Task<T> ExecuteScalarAsync<T>(string sql, object param = null, int? commandTimeout = null, CommandType commandType = CommandType.Text)
         {
-            return (Connection as DbConnection).ExecuteScalarAsync<T>(sql, param, Transaction, commandTimeout, commandType);
+            return SqlMapper.ExecuteScalarAsync<T>(sql, param, Transaction, commandTimeout, commandType);
         }
-        public virtual void Open(bool beginTransaction = false, IsolationLevel? isolationLevel = IsolationLevel.ReadUncommitted)
+        public virtual void Open(bool beginTransaction = false, IsolationLevel? isolationLevel = null)
         {
             Connection.Open();
             if (beginTransaction)
@@ -144,6 +147,7 @@ namespace SqlCommon.Linq
     public class DbProxyContext : IDbContext
     {
         private IDbContext DbContext { get; set; }
+        public ISqlMapper SqlMapper => DbContext.SqlMapper;
         public DbContextState DbContextState => DbContext.DbContextState;
         public DbContextType DbContextType => DbContext.DbContextType;
         public List<DbContextLogger> Loggers { get; private set; } = new List<DbContextLogger>();

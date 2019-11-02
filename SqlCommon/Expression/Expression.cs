@@ -424,94 +424,50 @@ namespace SqlCommon.Linq
     }
     public static class Operator
     {
-        public static bool In<T>(T column, IEnumerable<T> list)
-        {
-            return default;
-        }
-        public static bool In<T>(T column, params T[] values)
-        {
-            return default;
-        }
-        public static bool In<T>(T column, ISubQuery subuery)
-        {
-            return default;
-        }
-        public static bool NotIn<T>(T column, IEnumerable<T> enumerable)
-        {
-            return default;
-        }
-        public static bool NotIn<T>(T column, params T[] values)
-        {
-            return default;
-        }
-        public static bool NotIn(ValueType column, ISubQuery subuery)
-        {
-            return default;
-        }
-        public static T Any<T>(T subquery) where T : ISubQuery
-        {
-            return default;
-        }
-        public static T All<T>(T subquery) where T : ISubQuery
-        {
-            return default;
-        }
-        public static bool Exists(ISubQuery subquery)
-        {
-            return default;
-        }
-        public static bool NotExists(ISubQuery subquery)
-        {
-            return default;
-        }
-        public static bool Contains(string column, string text)
-        {
-            return default;
-        }
-        public static bool NotContains(string column, string text)
-        {
-            return default;
-        }
-        public static bool StartsWith(string column, string text)
-        {
-            return default;
-        }
-        public static bool NotStartsWith(string column, string text)
-        {
-            return default;
-        }
-        public static bool EndsWith(string column, string text)
-        {
-            return default;
-        }
-        public static bool NotEndsWith(string column, string text)
-        {
-            return default;
-        }
-        public static bool Regexp(string column, string regexp)
-        {
-            return default;
-        }
-        public static bool NotRegexp(string column, string regexp)
-        {
-            return default;
-        }
-        public static bool IsNull<T>(T column)
-        {
-            return default;
-        }
-        public static bool IsNotNull<T>(T column)
-        {
-            return default;
-        }
-        public static bool Between<T>(T column, T value1, T value2)
-        {
-            return default;
-        }
-        public static bool NotBetween<T>(T column, T value1, T value2)
-        {
-            return default;
-        }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool In<T>(T column, IEnumerable<T> list) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool In<T>(T column, params T[] values) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool In<T>(T column, ISubQuery subuery) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotIn<T>(T column, IEnumerable<T> enumerable) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotIn<T>(T column, params T[] values) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotIn(ValueType column, ISubQuery subuery) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static ISubQuery Any(ISubQuery subquery) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static ISubQuery All(ISubQuery subquery) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool Exists(ISubQuery subquery) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotExists(ISubQuery subquery) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool Contains(string column, string text) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotContains(string column, string text) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool StartsWith(string column, string text) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotStartsWith(string column, string text) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool EndsWith(string column, string text) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotEndsWith(string column, string text) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool Regexp(string column, string regexp) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotRegexp(string column, string regexp) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool IsNull<T>(T column) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool IsNotNull<T>(T column) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool Between<T>(T column, T value1, T value2) => default;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("样式", "IDE0060:删除未使用的参数", Justification = "<挂起>")]
+        public static bool NotBetween<T>(T column, T value1, T value2) => default;
         public static string GetOperator(string operatorType)
         {
             switch (operatorType)
@@ -631,8 +587,7 @@ namespace SqlCommon.Linq
                     var columnName = item.Name;
                     var identity = false;
                     var columnKey = ColumnKey.None;
-                    var columnAttribute = item.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() as ColumnAttribute;
-                    if (columnAttribute != null)
+                    if (item.GetCustomAttributes(typeof(ColumnAttribute), true).FirstOrDefault() is ColumnAttribute columnAttribute)
                     {
                         if (!columnAttribute.IsColumn)
                         {

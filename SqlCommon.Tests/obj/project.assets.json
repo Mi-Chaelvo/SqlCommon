@@ -2144,7 +2144,7 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
-      "SqlCommon/2.0.1": {
+      "SqlCommon/2.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -7429,7 +7429,7 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
-    "SqlCommon/2.0.1": {
+    "SqlCommon/2.0.2": {
       "type": "project",
       "path": "../SqlCommon/SqlCommon.csproj",
       "msbuildProject": "../SqlCommon/SqlCommon.csproj"
@@ -7442,7 +7442,7 @@
       "MySql.Data >= 8.0.18",
       "NUnit3TestAdapter >= 3.13.0",
       "Npgsql >= 4.1.1",
-      "SqlCommon >= 2.0.1",
+      "SqlCommon >= 2.0.2",
       "System.Data.SQLite.Core >= 1.0.112",
       "System.Data.SqlClient >= 4.7.0",
       "nunit >= 3.12.0"
