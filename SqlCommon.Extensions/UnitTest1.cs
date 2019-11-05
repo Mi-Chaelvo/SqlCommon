@@ -13,10 +13,9 @@ namespace SqlCommon.Extensions
         [Test]
         public void DapperTest()
         {
-            var connection = new MySql.Data.MySqlClient.MySqlConnection("server=localhost;user id=root;password=1024;database=test;");
-            var db = new DbContext(new Dapper.Extensions.DapperSqlMapper(connection), DbContextType.Mysql);
+            var connection = new System.Data.SqlClient.SqlConnection(@"Data Source=DESKTOP-9IS2HA6\SQLEXPRESS;Initial Catalog=test;Persist Security Info=True;User ID=sa;Password=1024");
+            var db = new DbContext(new Dapper.Extensions.DapperSqlMapper(connection), DbContextType.SqlServer);
             var list = db.From<Student>().Page(2,2).SelectMany();
-
         }
     }
 }
